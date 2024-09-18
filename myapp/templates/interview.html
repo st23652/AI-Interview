@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Practice Interview Questions</h2>
+<div id="interview-container">
+    <!-- Introduction and Instructions -->
+    <div id="interview-intro">
+        <p>Welcome to your interview portal where you can practice common job interview questions.</p>
+        <p>Please follow the instructions and respond to the questions as clearly as possible.</p>
+        <p>You can practice them as many times as you want.</p>
+        <label for="question-set">Select Question Set:</label>
+        <select id="question-set" onchange="loadQuestions()">
+            <option value="problem_solving">Problem Solving</option>
+            <option value="decision_making">Decision Making</option>
+            <option value="about_you">About You</option>
+            <option value="business">Business</option>
+            <option value="tech">Technology</option>
+            <option value="leadership">Leadership</option>
+            <option value="team">Teamwork</option>
+            <option value="communication">Communication</option>
+            <option value="motivation">Motivation</option>
+            <option value="finance">Finance</option>
+        </select>
+        <button id="start-interview" onclick="startInterview()">Start Interview</button>
+    </div>
+
+    <!-- Interview Questions and Responses -->
+    <div id="interview-session" style="display: none;">
+        <div id="question-container">
+            <p id="question-text"></p>
+        </div>
+        <div id="response-container">
+            <label for="response">Your Response:</label>
+            <textarea id="response" rows="4" cols="50"></textarea>
+        </div>
+        <div id="control-buttons">
+            <button id="submit-response" onclick="submitResponse()">Submit Response</button>
+            <button id="next-question" style="display: none;" onclick="nextQuestion()">Next Question</button>
+        </div>
+    </div>
+
+    <!-- Interview Completion Message -->
+    <div id="interview-completion" style="display: none;">
+        <p>Thank you for completing the interview. Your responses have been recorded.</p>
+    </div>
+</div>
+
+<!-- Include CV Reader & Interview Questions Customizer Component -->
+<template id="cv-reader-interview-questions-template">
+    <div class="bg-background text-primary-foreground p-8 rounded-lg shadow-lg">
+        <h1 class="text-2xl font-bold mb-4">CV Reader & Interview Questions Customizer</h1>
+        <img src="https://placehold.co/400?text=CV" alt="CV Image" class="mb-4">
+        <p class="text-lg mb-4">Upload a CV to analyze and generate customized interview questions.</p>
+        <input type="file" accept=".pdf" class="bg-input text-primary-foreground px-4 py-2 rounded-lg mb-4">
+        <button class="bg-primary text-primary-foreground px-4 py-2 rounded-lg mr-4 hover:bg-primary/80">Upload CV</button>
+        <button class="bg-secondary text-secondary-foreground px-4 py-2 rounded-lg hover:bg-secondary/80">Generate Questions</button>
+        <div class="mt-8">
+            <h2 class="text-lg font-bold mb-4">Generated Interview Questions:</h2>
+            <ul class="list-disc pl-6">
+                <li class="mb-2">Tell us about a challenging project you worked on and how you overcame obstacles.</li>
+                <li class="mb-2">Describe a situation where you had to work with a difficult team member.</li>
+                <li class="mb-2">Explain a time when you showed leadership skills.</li>
+            </ul>
+        </div>
+    </div>
+</template>
+
+<script>
+    let currentQuestionIndex = 0;
+    let answers = {};
+    let selectedQuestions = [];
+
+    function loadQuestions() {
+        const selectedSet = document.getElementById("question-set").value;
+        fetch(`/interviews/questions/${selectedSet}/`)
+            .then(response => response.json())
+            .then(data => {
+                selectedQuestions = data.questions;
+                displayQuestion();
+            })
+            .catch(error => console.error("Error loading questions:", error));
+    }
+
+    function startInterview() {
+        document.getElementById("interview-intro").style.display = "none";
+        document.getElementById("interview-session").style.display = "block";
+        loadQuestions();
+    }
+
+    function displayQuestion() {
+        if (currentQuestionIndex < selectedQuestions.length) {
+            document.getElementById("question-text").innerText = selectedQuestions[currentQuestionIndex].text;
+        } else {
+            completeInterview();
+        }
+    }
+
+    function submitResponse() {
+        const response = document.getElementById("response").value.trim();
+        if (response === "") {
+            alert("Please provide a response.");
+        } else {
+            const interviewId = "{{ interview.id }}";
+            const question = selectedQuestions[currentQuestionIndex];
+
+            fetch(`/interviews/${interviewId}/submit_response/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    question_id: question.id,
+                    response: response
+                })
+            }).then(response => {
+                if (response.ok) {
+                    answers[question.text] = response;
+                    document.getElementById("response").value = "";
+                    currentQuestionIndex++;
+                    displayQuestion();
+                } else {
+                    console.error("Error submitting response.");
+                }
+            });
+        }
+    }
+
+    function nextQuestion() {
+        document.getElementById("submit-response").style.display = "inline";
+        document.getElementById("next-question").style.display = "none";
+        displayQuestion();
+    }
+
+    function completeInterview() {
+        document.getElementById("interview-session").style.display = "none";
+        document.getElementById("interview-completion").style.display = "block";
+        saveResponses();
+    }
+
+    function saveResponses() {
+        const interviewId = "{{ interview.id }}";
+        fetch(`/interviews/${interviewId}/save_answers/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify(answers)
+        }).then(response => {
+            if (response.ok) {
+                console.log("Responses saved successfully.");
+            } else {
+                console.error("Error saving responses.");
+            }
+        }).catch(error => {
+            console.error("Error:", error);
+        });
+    }
+</script>
+{% endblock %}

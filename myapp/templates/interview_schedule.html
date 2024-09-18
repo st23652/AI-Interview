@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Schedule Interview{% endblock %}
+
+{% block content %}
+<div class="bg-background text-primary-foreground min-h-screen flex flex-col items-center justify-center">
+    <h1 class="text-3xl font-bold mb-4">Interview Scheduler</h1>
+    <img src="https://placehold.co/300?text=📅" alt="Interview Scheduler" class="mb-4" />
+    <p class="text-center max-w-md mb-4">Schedule your interview by selecting a suitable date and time slot below.</p>
+    <form method="POST">
+    {% csrf_token %}
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 max-w-md">
+            <div>
+                <p class="font-semibold">Select Date:</p>
+                <input type="date" name="date" class="w-full bg-input text-primary-foreground px-3 py-2 rounded-md border border-primary focus:outline-none focus:ring focus:ring-primary" required />
+            </div>
+            <div>
+                <p class="font-semibold">Select Time:</p>
+                <input type="time" name="time" class="w-full bg-input text-primary-foreground px-3 py-2 rounded-md border border-primary focus:outline-none focus:ring focus:ring-primary" required />
+            </div>
+        </div>
+        <button type="submit" class="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/80 transition-colors duration-300 mt-4">Confirm Interview</button>
+</form>
+</div>
+{% endblock %}

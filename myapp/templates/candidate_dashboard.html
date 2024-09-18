@@ -1,0 +1,26 @@
+{% extends 'base.html' %}  
+  
+{% block content %}  
+<div class="dashboard">  
+    <h2>Jobs Applied</h2>  
+        <div class="job-listings">  
+            {% for job in jobs %}  
+            <div class="job">  
+                <h3>{{ job.title }}</h3>  
+                <div class="application-status">  
+                    <p>Applied on {{ job.applied_date }}</p>  
+                    <p>Interview on {{ job.interview_date }}</p>  
+                    <p>Reviewed by HR Manager on {{ job.reviewed_date }}</p>  
+                </div>  
+            </div>  
+            {% endfor %}  
+        </div>  
+</div>  
+{% endblock %}
+
+
+
+
+
+
+

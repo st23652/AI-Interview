@@ -1,0 +1,1 @@
+We are looking for a software engineer with experience in Python, Django, and machine learning. The ideal candidate should have at least 3 years of experience in developing web applications and a strong understanding of AI technologies.

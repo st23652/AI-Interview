@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+<head>
+    <title>Auto Interview Page</title>
+</head>
+<body>
+    <div id="interview-session">
+        <div id="question-container">
+            <p id="question-text"></p>
+        </div>
+        <div id="response-container">
+            <label for="response">Your Response:</label>
+            <textarea id="response" rows="4" cols="50"></textarea>
+        </div>
+        <div id="control-buttons">
+            <button id="submit-response" onclick="submitResponse()">Submit Response</button>
+            <button id="next-question" style="display: none;" onclick="nextQuestion()">Next Question</button>
+        </div>
+    </div>
+
+    <script>
+        let interviewId = "{{ interview.id }}"; // Set this from Django context
+        let answers = {};
+        let currentQuestionIndex = 0;
+
+        function fetchNextQuestion() {
+            fetch(`/interviews/${interviewId}/next_question/?answers=${encodeURIComponent(JSON.stringify(answers))}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error(data.error);
+                        return;
+                    }
+                    document.getElementById('question-text').innerText = data.question;
+                    document.getElementById('next-question').style.display = 'none';
+                    document.getElementById('submit-response').style.display = 'inline';
+                }).catch(error => {
+                    console.error('Error fetching next question:', error);
+                });
+        }
+
+        function submitResponse() {
+            const response = document.getElementById('response').value.trim();
+            if (response === "") {
+                alert("Please provide a response.");
+                return;
+            }
+            
+            answers[currentQuestionIndex] = response;
+            document.getElementById('response').value = "";
+
+            currentQuestionIndex++;
+            document.getElementById('submit-response').style.display = 'none';
+            document.getElementById('next-question').style.display = 'inline';
+            
+            fetchNextQuestion();
+        }
+
+        function nextQuestion() {
+            fetchNextQuestion();
+        }
+
+        // Initial call to start the interview
+        fetchNextQuestion();
+    </script>
+</body>
+
+{% endblock %}
