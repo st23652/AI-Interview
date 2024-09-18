@@ -1,0 +1,11 @@
+{% extend 'base.html' %}
+{% block content %}
+
+<h3>Emotion Analysis:</h3>
+<ul>
+    {% for emotion, score in emotions.items %}
+        <li>{{ emotion }}: {{ score }}</li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

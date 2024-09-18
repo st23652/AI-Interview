@@ -1,0 +1,101 @@
+/* General body styling */
+.profile-picture {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: scale-down;
+}
+
+@media (max-width: 600px) {
+    .profile-picture {
+        width: 100px;
+        height: 100px;
+    }
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4; /* Light grey background color */
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header styling */
+header {
+    background-color: #333; /* Dark background color */
+    color: #fff; /* White text color */
+    padding: 10px 0;
+    text-align: center;
+}
+
+header a {
+    color: #fff; /* White text color for links */
+    text-decoration: none;
+    padding: 10px;
+    font-size: 16px;
+}
+
+header a:hover {
+    background-color: #555; /* Darker background color on hover */
+}
+
+/* Footer styling */
+footer {
+    background-color: #333; /* Dark background color */
+    color: #fff; /* White text color */
+    padding: 10px 0;
+    text-align: center;
+    padding: 10px 0;
+    position: fixed;
+    width: 100%;
+    margin-top: auto; /* Push the footer to the bottom */
+}
+
+/* Navigation bar styling */
+nav {
+    background-color: #444; /* Darker background color for nav */
+    color: #fff; /* White text color */
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+}
+
+nav ul li {
+    margin: 0;
+}
+
+nav ul li a {
+    color: #fff; /* White text color for nav links */
+    text-decoration: none;
+    padding: 15px;
+    display: block;
+}
+
+nav ul li a:hover {
+    background-color: #555; /* Darker background color on hover */
+}
+
+/* Main content area */
+main {
+    padding: 20px;
+    flex: 1; /* Allow the main content area to grow and take up space */
+}
+
+#candidate_fields, #employer_fields {
+    display: none; /* Ensure fields are shown/hidden dynamically by JavaScript */
+}
+
+.profile-pic {
+    width: 3px;    /* Smaller width */
+    height: 3px;   /* Smaller height */
+    border-radius: 50%; /* Make the image circular */
+}
+

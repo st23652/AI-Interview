@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Interview{% endblock %}
+
+{% block content %}
+<h2>Add Interview</h2>
+<form method="POST" action="{% url 'add_interview' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+        <button type="submit">Save Interview</button>
+</form>
+    <a href="{% url 'interview' %}">Back to Interview List</a>
+</body>
+</html>
+{% endblock %}
