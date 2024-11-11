@@ -1,9 +1,10 @@
 from django.contrib import admin
 from .models import Job, CustomUser
-from django.contrib.auth.admin import UserAdmin, CustomUserAdmin
+from django.conf import settings
+from django.contrib.auth.admin import UserAdmin
 from .models import CVSubmission  # Import your model
 
-admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(CustomUser)
 
 @admin.register(Job)
 class JobAdmin(admin.ModelAdmin):

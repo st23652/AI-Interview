@@ -1,0 +1,153 @@
+This is our chat window for now
+You send entire folder "myproject"???
+yeah
+The main folder is MYPROJECT and the child folder is myproject?
+yes and myapp
+the main folders for this project is myapp, myproject, api-gateway and watson_integration
+
+
+Do not move cursor. it takes away control from my side.
+
+Also, put all the files that you do not want to send in .gitignore file
+
+can u guide me how to do tht
+
+Sure.
+here is what you do: 
+	Put names of all the folders that you do not want to send in .gitignore
+
+
+like this?
+Okay, so here is how you use *:
+	if you have a file with name test_ then you do test*
+when you have file with name _test_ then you do *test*
+If you have multiple __test__ then you do **test**
+
+If you have multiple like this __test then **test
+
+Got my point?
+
+
+Basically if you have some pattern in file name and you want all the files to be included in .gitignore then you use *
+
+getting the point?
+
+Noo
+
+
+here _ represents chars and not literal underscores
+ah ok got it
+
+add more folders that need not to be pushed
+
+ok
+
+Hey, does this dir have more than one .git file?
+Did you change the config of .git to handle more than one repo push?
+no i dont think so
+
+Why there are 2 source controls here?
+
+wait let me delete tht from main it is useless
+will it solve the problem now?
+
+you are using master branch, correct?
+Hello?
+You there?
+yes
+
+
+ok wait so how do i know which files r huge nd need lfs for them
+
+
+
+ok idk the folder is empty but wont delete
+
+????
+hello r u there
+
+hey, the .git file was inside the Ai-Interview folder?
+no
+it was separate
+already deleted
+
+Do you see there are 2 gits
+i had no idea abt this
+
+The entire github is created because of this
+
+It is trying to push in some other git
+
+Open your github
+
+Hey why are you pushing credentials in GitHub?
+Your repo is public
+ah some coding needed to hv the key
+let me make it private right away
+
+Hey this is again not proper. Why there are so many pips?
+i initially made the project there by mistake so i just continued 
+
+Finally done
+!!
+
+YESSSSSSSS
+FINALLY
+THANK YOU SO MUCH
+
+Great work partner
+i did nothing 🙃
+
+It was a team work
+
+Also, I will take your leave now!
+
+run the command here
+
+could u figure out the problem ?
+kinda but not exactly sure
+what is it?
+
+The issue is created when you change the auth user model after you do the migrations. In your case I think you have done the same. You first created migrations with the default user model and later you changed it, is that correct?
+
+i dont think so i changed it cause from start i hv customuser and before yest night i nv got the issue. Okay, your changes that you had done previously were replaced
+
+i did some coding and changes yest but i doubt i touched models at all
+
+
+
+
+
+
+i think u should sleep, it is late and solution to this doesn't seem close
+
+Yes, that seems true. I will try to figure the soln until tomorrow. There are many loose ends here
+
+ok cool sorry to drag u for this
+i spoilt ur night
+
+hey, no. I work late
+
+So no worries and have a good night
+u also bye bye
+bye
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

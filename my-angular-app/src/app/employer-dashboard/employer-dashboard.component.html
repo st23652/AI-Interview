@@ -1,0 +1,23 @@
+<div class="dashboard-container">
+    <h2>Employer Dashboard</h2>
+  
+    <section class="job-postings">
+      <h3>Job Postings</h3>
+      <ul>
+        <li *ngFor="let job of jobPostings" (click)="loadJobApplications(job.id)">
+          {{ job.title }} - {{ job.status }}
+        </li>
+      </ul>
+    </section>
+  
+    <section *ngIf="selectedJobId !== null" class="applications">
+      <h3>Applications for Job ID: {{ selectedJobId }}</h3>
+      <ul>
+        <li *ngFor="let application of jobApplications">
+          {{ application.candidateName }} - {{ application.status }}
+          <button (click)="scheduleInterview(application.candidateId)">Schedule Interview</button>
+        </li>
+      </ul>
+    </section>
+  </div>
+  
