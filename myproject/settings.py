@@ -11,9 +11,9 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 import os
-from pathlib import Path
 from dotenv import load_dotenv
 load_dotenv()
+
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -65,8 +65,8 @@ LOGGING = {
     },
 }
 
-# Custom user model
-AUTH_USER_MODEL = 'myapp.CustomUser'
+
+
 
 # Templates configuration
 TEMPLATES = [
@@ -88,6 +88,7 @@ TEMPLATES = [
 # Application definition
 
 INSTALLED_APPS = [
+    'myapp',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -95,7 +96,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'myapp',
     'watson_integration',
 ]
 
@@ -110,6 +110,9 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'myproject.urls'
+
+# Custom user model
+AUTH_USER_MODEL = 'myapp.customuser'
 
 AUTHENTICATION_BACKENDS = [
     'myapp.backends.EmailBackend',  # Your custom backend

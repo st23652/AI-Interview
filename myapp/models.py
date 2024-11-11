@@ -85,6 +85,9 @@ class CustomUser(AbstractBaseUser):
 
     def __str__(self):
         return self.username
+    
+    class Meta:
+        abstract = False
 
 class Resume(models.Model):
     candidate = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
