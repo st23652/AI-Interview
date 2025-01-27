@@ -10,30 +10,34 @@
     {% endblock %}
 </head>
 <body>
+    <!-- Header Section -->
     <header>
-        <h1>AI Interviewer</h1>
-        <nav>
-            <ul>
-                <li><a href="{% url 'home' %}">Home</a></li>
-                {% if user.is_authenticated %}
-                    {% if user.profile.is_employer %}
-                        {% include 'header_e.html' %}
-                    {% elif user.profile.is_candidate %}
-                        {% include 'header_c.html' %}
+        <div class="container">
+            <h1><a href="{% url 'home' %}">AI Interviewer</a></h1>
+            <nav>
+                <ul>
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    {% if user.is_authenticated %}
+                        {% if user.profile.is_employer %}
+                            {% include 'header_e.html' %}
+                        {% elif user.profile.is_candidate %}
+                            {% include 'header_c.html' %}
+                        {% endif %}
+                        <li><a href="{% url 'profile' %}">Profile</a></li>
+                        <li><a href="{% url 'logout' %}">Logout</a></li>
+                    {% else %}
+                        <li><a href="{% url 'login' %}">Login</a></li>
+                        <li><a href="{% url 'register' %}">Register</a></li>
                     {% endif %}
-                    <li><a href="{% url 'profile' %}">Profile</a></li>
-                    <li><a href="{% url 'logout' %}">Logout</a></li>
-                {% else %}
-                    <li><a href="{% url 'login' %}">Login</a></li>
-                    <li><a href="{% url 'register' %}">Register</a></li>
-                {% endif %}
-            </ul>
-        </nav>
+                </ul>
+            </nav>
+        </div>
     </header>
 
+    <!-- Flash Messages Section -->
     {% block messages %}
     {% if messages %}
-        <div>
+        <div class="messages-container">
             {% for message in messages %}
                 <div class="alert {{ message.tags }}">{{ message }}</div>
             {% endfor %}
@@ -41,14 +45,20 @@
     {% endif %}
     {% endblock %}
 
+    <!-- Main Content Section -->
     <main>
-        {% block content %}
-        <!-- Main content will be injected by child templates -->
-        {% endblock %}
+        <div class="content-container">
+            {% block content %}
+            <!-- Child templates inject content here -->
+            {% endblock %}
+        </div>
     </main>
 
+    <!-- Footer Section -->
     <footer>
-        <p>&copy; 2024 AI Interviewer. All rights reserved.</p>
+        <div class="container">
+            <p>&copy; {{ now|date:"Y" }} AI Interviewer. All rights reserved.</p>
+        </div>
     </footer>
 </body>
 </html>

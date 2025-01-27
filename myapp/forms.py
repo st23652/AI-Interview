@@ -7,7 +7,6 @@ from .models import CVUpload
 from .models import Candidate, Employer
 from .models import Interview  # Import your Interview model
 from .models import InterviewAnswer
-from .models import Resume
 
 class InterviewFeedbackForm(forms.ModelForm):
     class Meta:
@@ -19,7 +18,7 @@ class InterviewFeedbackForm(forms.ModelForm):
 
 class ResumeUploadForm(forms.ModelForm):
     class Meta:
-        model = Resume
+        model = CV
         fields = ['file']
 
 class AnswerForm(forms.ModelForm):

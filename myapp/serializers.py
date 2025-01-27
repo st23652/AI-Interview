@@ -1,6 +1,11 @@
 # serializers.py
 from rest_framework import serializers
-from .models import Profile, Job, Application, Interview, Question, InterviewQuestion
+from .models import Profile, Job, Application, Interview, Question, InterviewQuestion, CustomUser
+
+class CustomUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = '__all__'
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
