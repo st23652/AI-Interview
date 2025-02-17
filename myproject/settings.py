@@ -11,49 +11,22 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 import os
+from pathlib import Path
+
 from dotenv import load_dotenv
+
 load_dotenv()
 
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-yzp)ko$iekzbb#lkxxg4*qgiw4^+-l2%)71$1q^2^xwh300@@f'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-
-ALLOWED_HOSTS = [
-    '127.0.0.1',
-    'localhost',
-    'b09a-2001-8f8-1a61-c9ac-b966-ccbc-33cc-9bbf.ngrok-free.app'
-]
-
-CSRF_TRUSTED_ORIGINS = [
-    'https://b09a-2001-8f8-1a61-c9ac-b966-ccbc-33cc-9bbf.ngrok-free.app'
-]
-
-# Email settings
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-
-# Logging configuration
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
         'file': {
             'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, 'debug.log'),
-            'maxBytes': 1024 * 1024 * 5,  # 5 MB
-            'backupCount': 5,
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',
         },
     },
     'loggers': {
@@ -65,30 +38,33 @@ LOGGING = {
     },
 }
 
+AUTH_USER_MODEL = 'myapp.CustomUser'
 
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-# Templates configuration
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'myapp/templates/email_templates')],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = 'django-insecure-yzp)ko$iekzbb#lkxxg4*qgiw4^+-l2%)71$1q^2^xwh300@@f'
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
+# settings.py
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    'b09a-2001-8f8-1a61-c9ac-b966-ccbc-33cc-9bbf.ngrok-free.app'
 ]
 
-# Application definition
+CSRF_TRUSTED_ORIGINS = ['https://b09a-2001-8f8-1a61-c9ac-b966-ccbc-33cc-9bbf.ngrok-free.app']
 
+LOGOUT_REDIRECT_URL = '/'
+
+# Application definition
 INSTALLED_APPS = [
-    'myapp',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -96,7 +72,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'watson_integration',
+    'myapp',  # Add your app here
+    'myproject',
 ]
 
 MIDDLEWARE = [
@@ -111,12 +88,26 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'myproject.urls'
 
-# Custom user model
-AUTH_USER_MODEL = 'myapp.customuser'
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            BASE_DIR / 'templates',
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
 
 AUTHENTICATION_BACKENDS = [
-    'myapp.backends.EmailBackend',  # Your custom backend
-    'django.contrib.auth.backends.ModelBackend',  # Default backend
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 LOGIN_URL = 'login'
@@ -125,17 +116,15 @@ LOGOUT_REDIRECT_URL = 'home'
 
 WSGI_APPLICATION = 'myproject.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv("DB_NAME"),
-        'USER': os.getenv("DB_USER"),
-        'PASSWORD': os.getenv("DB_PASSWORD"),
-        'HOST': '127.0.0.1',
+        'NAME': 'mydatabase',       # Replace with your database name
+        'USER': 'postgres',     # Replace with your database user
+        'PASSWORD': 'Happy@2577', # Replace with your database password
+        'HOST': 'localhost',
         'PORT': '5432',
     }
 }
@@ -143,7 +132,6 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'myapp.validators.CustomPasswordValidator',
@@ -162,10 +150,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -174,26 +160,20 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATICFILES_DIRS = [os.path.join(BASE_DIR/"myapp/", 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# CSRF settings
 CSRF_FAILURE_VIEW = 'myapp.views.csrf_failure'
-CSRF_COOKIE_SECURE = True  # Secure CSRF cookie over HTTPS
 
-# OpenAI API key
-# This is incorrect way to do this
-OPENAI_API_KEY=os.getenv("OPENAI_API_KEY")
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+CSRF_COOKIE_SECURE = False

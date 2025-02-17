@@ -10,8 +10,7 @@ from django.contrib import messages
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.decorators.csrf import csrf_protect
-from .models import CandidateProfile, CandidateResponse, InterviewResponse
-from .utils import generate_follow_up_question, generate_questions_based_on_cv
+from .models import Profile, CandidateResponse
 import openai
 from .models import Application, CustomUser, Interview, InterviewAnswer, InterviewQuestion, Job, CVUpload, Profile, Sector, Question, CandidateResponse, SkillAssessment
 from .forms import CVForm, CandidateProfileForm, JobApplicationForm, JobForm, ProfileForm, SettingsForm, InterviewScheduleForm, CustomUserCreationForm, InterviewForm, SkillAssessmentForm, UserRegistrationForm, YourForm
@@ -32,6 +31,21 @@ from .serializers import InterviewSerializer, JobSerializer, CustomUserSerialize
 from .forms import InterviewFeedbackForm
 import os
 from dotenv import load_dotenv
+from django.http import JsonResponse
+from myapp.ai_feedback.ai_feedback import AIInterviewScorer
+
+def evaluate_answer(request):
+    if request.method == "POST":
+        candidate_response = request.POST.get("response")
+        job_role = request.POST.get("job_role", "Software Engineer")
+
+        if not candidate_response:
+            return JsonResponse({"error": "No response provided"}, status=400)
+
+        scorer = AIInterviewScorer(job_role)
+        result = scorer.generate_feedback(candidate_response)
+
+        return JsonResponse(result)
 
 load_dotenv()
 
@@ -51,7 +65,7 @@ def submit_response(request, interview_id):
         question = InterviewQuestion.objects.get(id=data['question'])
         
         # Save the response
-        response = InterviewResponse.objects.create(
+        response = InterviewAnswer.objects.create(
             interview=interview,
             question=question,
             response_text=data['response']
@@ -139,7 +153,7 @@ def dashboard(request):
         return render(request, 'employer_dashboard.html')
     elif request.user.is_candidate:
         return render(request, 'candidate_dashboard.html')
-    return redirect('login')
+    return redirect('user_login')
 
 def some_view(request):
     user = request.user
@@ -613,11 +627,11 @@ def user_login(request):
                 return redirect('home')  # Redirect to home or another page
             else:
                 messages.error(request, "Invalid email or password.")
-                return render(request, 'login.html', {'form': form})
+                return render(request, 'user_login.html', {'form': form})
     else:
         form = AuthenticationForm()
 
-    return render(request, 'login.html', {'form': form})
+    return render(request, 'user_login.html', {'form': form})
 
 def candidate_home(request):
     return render(request, 'candidate_home.html')
@@ -762,7 +776,7 @@ def interview_schedule(request):
 @login_required
 def interview(request, interview_id):
     interview = Interview.objects.get(id=interview_id)
-    profile = CandidateProfile.objects.get(user=interview.candidate)
+    profile = Profile.objects.get(user=interview.candidate)
     parsed_data = profile.cv_parsed_data
 
     # Retrieve all previous responses
