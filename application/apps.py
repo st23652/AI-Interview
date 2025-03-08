@@ -10,7 +10,7 @@ def user_saved_handler(sender, instance, created, **kwargs):
         print(f"The user {instance.email} has been updated!")
 
 class MyAppConfig(AppConfig):
-    name = 'myapp'
+    name = 'application'
     
     def ready(self):
         # Import the model inside the ready method to avoid circular imports

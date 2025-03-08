@@ -4,8 +4,8 @@ from django.core import mail
 from django.urls import reverse
 from django.template.loader import render_to_string
 from django.utils import timezone
-from myapp.models import CustomUser, Interview, Job
-from myapp.views import send_interview_link
+from application.models import CustomUser, Interview, Job
+from application.views import send_interview_link
 
 class EmailSendingTests(TestCase):
 

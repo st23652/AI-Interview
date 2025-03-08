@@ -6,7 +6,6 @@ from .models import Profile, Job, Application, Interview, SkillAssessment, Skill
 from .models import CVUpload
 from .models import Candidate, Employer
 from .models import Interview  # Import your Interview model
-from .models import InterviewAnswer
 from .models import Resume
 
 class InterviewFeedbackForm(forms.ModelForm):
