@@ -21,6 +21,10 @@ class ResumeUploadForm(forms.ModelForm):
         model = Resume
         fields = ['file']
 
+
+class InterviewAnswer:
+    pass
+
 class AnswerForm(forms.ModelForm):
     class Meta:
         model = InterviewAnswer

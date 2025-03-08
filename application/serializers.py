@@ -1,5 +1,7 @@
 # serializers.py
-from rest_framework import serializers
+import rest_framework
+from django.contrib.postgres import serializers
+
 from .models import Profile, Job, Application, Interview, Question, InterviewQuestion
 from .models import CustomUser
 

@@ -3,7 +3,7 @@ from django.conf.urls.static import static
 from django.urls import path, include
 from .views import get_next_question, save_answers
 from . import views
-from rest_framework.routers import SimpleRouter
+import rest_framework.routers
 
 # Define the router and register your viewsets
 router = SimpleRouter()

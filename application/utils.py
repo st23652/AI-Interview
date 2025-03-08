@@ -1,5 +1,5 @@
 import json
-from project.settings import OPENAI_API_KEY
+from myproject.settings import OPENAI_API_KEY
 import openai
 from some_speech_synthesis_library import synthesize_speech  # type: ignore
 import speech_recognition as sr
