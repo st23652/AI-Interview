@@ -6,7 +6,7 @@ depends22_x64
 docs
 libomp140.x86_64_x86-64*
 media
-project-clean
+myproject-clean
 numpy-2.1.1
 spacy-3.7.6
 ./static
@@ -25,4 +25,3 @@ AI-Interview
 **.sqlite**
 **migrations**
 .env
-** venv
