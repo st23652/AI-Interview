@@ -72,7 +72,7 @@ LOGGING = {
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'myapp/templates/email_templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'application/templates/email_templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -88,7 +88,7 @@ TEMPLATES = [
 # Application definition
 
 INSTALLED_APPS = [
-    'myapp',
+    'application',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -112,10 +112,10 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'myproject.urls'
 
 # Custom user model
-AUTH_USER_MODEL = 'myapp.customuser'
+AUTH_USER_MODEL = 'application.CustomUser'
 
 AUTHENTICATION_BACKENDS = [
-    'myapp.backends.EmailBackend',  # Your custom backend
+    'application.backends.EmailBackend',  # Your custom backend
     'django.contrib.auth.backends.ModelBackend',  # Default backend
 ]
 
@@ -132,24 +132,23 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv("DB_NAME"),
-        'USER': os.getenv("DB_USER"),
-        'PASSWORD': os.getenv("DB_PASSWORD"),
+        'NAME': "postgres",
+        'USER': "postgres",
+        'PASSWORD': "Happy@2577",
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'myapp.validators.CustomPasswordValidator',
+        'NAME': 'application.validators.CustomPasswordValidator',
     },
     {
-        'NAME': 'myapp.validators.CustomUserAttributeSimilarityValidator',
+        'NAME': 'application.validators.CustomUserAttributeSimilarityValidator',
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
@@ -186,7 +185,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # CSRF settings
-CSRF_FAILURE_VIEW = 'myapp.views.csrf_failure'
+CSRF_FAILURE_VIEW = 'application.views.csrf_failure'
 CSRF_COOKIE_SECURE = True  # Secure CSRF cookie over HTTPS
 
 # OpenAI API key

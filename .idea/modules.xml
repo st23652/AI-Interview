@@ -9,6 +9,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/myproject.iml" filepath="$PROJECT_DIR$/.idea/myproject.iml" />
       <module fileurl="file://$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/java/test cases.iml" filepath="$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/java/test cases.iml" />
       <module fileurl="file://$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/unit/unit.iml" filepath="$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/unit/unit.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/AI-Interview.iml" filepath="$PROJECT_DIR$/.idea/AI-Interview.iml" />
     </modules>
   </component>
 </project>

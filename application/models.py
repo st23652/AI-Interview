@@ -1,11 +1,11 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import BaseUserManager, AbstractUser
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth import get_user_model
+from django.contrib.auth import settings
 from django.core.exceptions import ValidationError
 
-User = get_user_model()
+User = settings.AUTH_USER_MODEL
 
 class Interview(models.Model):
     title = models.CharField(max_length=200)
@@ -14,7 +14,14 @@ class Interview(models.Model):
     interviewer = models.ForeignKey(User, related_name='conducted_interviews', on_delete=models.CASCADE)
     scheduled_date = models.DateTimeField()
     status = models.CharField(max_length=20, choices=(('scheduled', 'Scheduled'), ('completed', 'Completed')))
-    question_set = models.CharField(max_length=50, choices=(('problem_solving', 'Problem Solving'), ('decision_making', 'Decision Making'), ...))  # Add all sets
+    question_set = models.CharField(
+        max_length=50,
+        choices=(
+            ('problem_solving', 'Problem Solving'),
+            ('decision_making', 'Decision Making'),
+            ('technical_knowledge', 'Technical Knowledge'),  # Add other sets
+        )
+    )
     answers = models.JSONField()  # Store answers in a JSON field (ideal for dynamic questions)
     feedback = models.TextField(blank=True, null=True)
     completed = models.BooleanField(default=False)
@@ -52,7 +59,7 @@ def validate_file(value):
     if not value.name.endswith('.pdf'):
         raise ValidationError('Only PDF files are allowed.')
 
-class CustomUser(AbstractBaseUser):
+class CustomUser(AbstractUser):
     ROLE_CHOICES = [
         ('candidate', 'Candidate'),
         ('employer', 'Employer'),
@@ -337,8 +344,6 @@ class Application(models.Model):
 
     def __str__(self):
         return f"{self.candidate.user.username} - {self.job.title}"
-    
-User = get_user_model()
 
 class SkillAssessment(models.Model):
     name = models.CharField(max_length=200)
