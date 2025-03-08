@@ -1,7 +1,6 @@
 import json
 from myproject.settings import OPENAI_API_KEY
 import openai
-from some_speech_synthesis_library import synthesize_speech  # type: ignore
 import speech_recognition as sr
 import whisper
 import spacy
@@ -61,7 +60,7 @@ def parse_job_description(description):
     # Placeholder code to parse job description
     return parsed_data
 
-def conduct_interview(interview):
+def conduct_interview(interview, synthesize_speech=None):
     transcript = []
     questions = generate_questions(interview.job.parsed_description, interview.candidate.parsed_resume)
     for question in questions:

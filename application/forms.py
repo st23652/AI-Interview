@@ -1,6 +1,6 @@
 # myapp/forms.py
 from django import forms
-from .models import CV, CustomUser, JobApplication
+from .models import CV, CustomUser, JobApplication, InterviewResponse
 from django.contrib.auth.forms import UserCreationForm
 from .models import Profile, Job, Application, Interview, SkillAssessment, Skill, SkillAssessmentResult
 from .models import CVUpload
@@ -21,13 +21,9 @@ class ResumeUploadForm(forms.ModelForm):
         model = Resume
         fields = ['file']
 
-
-class InterviewAnswer:
-    pass
-
 class AnswerForm(forms.ModelForm):
     class Meta:
-        model = InterviewAnswer
+        model = InterviewResponse
         fields = ['answer_text']
 
 class InterviewForm(forms.ModelForm):

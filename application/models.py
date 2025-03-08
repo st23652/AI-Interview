@@ -1,11 +1,11 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import BaseUserManager, AbstractUser
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth import get_user_model
+from django.contrib.auth import settings
 from django.core.exceptions import ValidationError
 
-User = get_user_model()
+User = settings.AUTH_USER_MODEL
 
 class Interview(models.Model):
     title = models.CharField(max_length=200)
@@ -52,7 +52,7 @@ def validate_file(value):
     if not value.name.endswith('.pdf'):
         raise ValidationError('Only PDF files are allowed.')
 
-class CustomUser(AbstractBaseUser):
+class CustomUser(AbstractUser):
     ROLE_CHOICES = [
         ('candidate', 'Candidate'),
         ('employer', 'Employer'),
@@ -337,8 +337,6 @@ class Application(models.Model):
 
     def __str__(self):
         return f"{self.candidate.user.username} - {self.job.title}"
-    
-User = get_user_model()
 
 class SkillAssessment(models.Model):
     name = models.CharField(max_length=200)
