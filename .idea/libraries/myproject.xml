@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="myproject">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libomp140.x86_64_x86-64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/bfg-1.12.4-SNAPSHOT-git-lfs-7242876.jar!/" />
+      <root url="jar://$PROJECT_DIR$/bfg.jar!/" />
+      <root url="jar://$PROJECT_DIR$/depends22_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/Update to Scala 2.13.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
