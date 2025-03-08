@@ -14,7 +14,14 @@ class Interview(models.Model):
     interviewer = models.ForeignKey(User, related_name='conducted_interviews', on_delete=models.CASCADE)
     scheduled_date = models.DateTimeField()
     status = models.CharField(max_length=20, choices=(('scheduled', 'Scheduled'), ('completed', 'Completed')))
-    question_set = models.CharField(max_length=50, choices=(('problem_solving', 'Problem Solving'), ('decision_making', 'Decision Making'), ...))  # Add all sets
+    question_set = models.CharField(
+        max_length=50,
+        choices=(
+            ('problem_solving', 'Problem Solving'),
+            ('decision_making', 'Decision Making'),
+            ('technical_knowledge', 'Technical Knowledge'),  # Add other sets
+        )
+    )
     answers = models.JSONField()  # Store answers in a JSON field (ideal for dynamic questions)
     feedback = models.TextField(blank=True, null=True)
     completed = models.BooleanField(default=False)

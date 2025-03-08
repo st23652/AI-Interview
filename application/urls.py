@@ -1,13 +1,13 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include
-from .views import get_next_question, save_answers
 from . import views
-import rest_framework.routers
+from .views import get_next_question, save_answers
+from rest_framework.routers import SimpleRouter
 
 # Define the router and register your viewsets
 router = SimpleRouter()
-router.register(r'users', views.UserViewSet)
+router.register(r'users', views.JobViewSet)
 
 # Define your URL patterns
 urlpatterns = [
@@ -49,7 +49,7 @@ urlpatterns = [
     path('interview_schedule/', views.interview_schedule, name='interview_schedule'),
     path('interview/', views.interview, name='interview'),
     path('job_application_list/', views.job_application_list, name='job_application_list'),
-    path('job_postings/', views.job_postings_view, name='job_postings'),
+    path('job_postings/', views.job_postings, name='job_postings'),
     path('profile_update/', views.profile_update, name='profile_update'),
     path('reset_password/', views.reset_password, name='reset_password'),
     path('settings/', views.update_settings, name='settings'),

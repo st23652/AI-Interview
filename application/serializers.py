@@ -5,37 +5,37 @@ from django.contrib.postgres import serializers
 from .models import Profile, Job, Application, Interview, Question, InterviewQuestion
 from .models import CustomUser
 
-class CustomUserSerializer(serializers.ModelSerializer):
+class CustomUserSerializer(serializers.BaseSerializer):
     class Meta:
         model = CustomUser
-        fields = '__all__'  # Or define specific fields you want to serialize
+        fields = '__all__'
 
-class ProfileSerializer(serializers.ModelSerializer):
+class ProfileSerializer(serializers.BaseSerializer):
     class Meta:
         model = Profile
         fields = '__all__'
 
-class JobSerializer(serializers.ModelSerializer):
+class JobSerializer(serializers.BaseSerializer):
     class Meta:
         model = Job
         fields = '__all__'
 
-class ApplicationSerializer(serializers.ModelSerializer):
+class ApplicationSerializer(serializers.BaseSerializer):
     class Meta:
         model = Application
         fields = '__all__'
 
-class InterviewSerializer(serializers.ModelSerializer):
+class InterviewSerializer(serializers.BaseSerializer):
     class Meta:
         model = Interview
         fields = '__all__'
 
-class QuestionSerializer(serializers.ModelSerializer):
+class QuestionSerializer(serializers.BaseSerializer):
     class Meta:
         model = Question
         fields = '__all__'
 
-class InterviewQuestionSerializer(serializers.ModelSerializer):
+class InterviewQuestionSerializer(serializers.BaseSerializer):
     class Meta:
         model = InterviewQuestion
         fields = '__all__'

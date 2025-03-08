@@ -335,7 +335,7 @@ def save_answers(request, interview_id):
                 # Find the question object
                 question = models.Question.objects.get(text=question_text)
                 # Save the answer
-                InterviewAnswer.objects.create(interview=interview, question=question, answer=answer)
+                InterviewResponse.objects.create(interview=interview, question=question, answer=answer)
             return JsonResponse({'message': 'Responses saved successfully.'}, status=200)
         except models.Interview.DoesNotExist:
             return JsonResponse({'error': 'Interview not found.'}, status=404)

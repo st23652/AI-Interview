@@ -24,7 +24,7 @@ class ResumeUploadForm(forms.ModelForm):
 class AnswerForm(forms.ModelForm):
     class Meta:
         model = InterviewResponse
-        fields = ['answer_text']
+        fields = ['response_text', 'interview', 'question']
 
 class InterviewForm(forms.ModelForm):
     class Meta:
@@ -127,13 +127,25 @@ class ProfileUpdateForm(forms.ModelForm):
         ]
 
 class JobApplicationForm(forms.ModelForm):
+    # These fields won't be in the database but will display the user's information
+    candidate_name = forms.CharField(max_length=255, required=False, disabled=True)
+    candidate_email = forms.EmailField(required=False, disabled=True)
+
     class Meta:
         model = JobApplication
-        fields = ['candidate_name', 'candidate_email', 'resume', 'cover_letter']
+        fields = ['job', 'resume', 'cover_letter', 'status']  # Do not include candidate_name and candidate_email here
         widgets = {
             'cover_letter': forms.Textarea(attrs={'rows': 4}),
         }
-    
+
+    def __init__(self, *args, **kwargs):
+        # Initialize the form and set the candidate_name and candidate_email based on the applicant
+        super().__init__(*args, **kwargs)
+
+        if self.instance and self.instance.applicant:
+            self.fields['candidate_name'].initial = self.instance.applicant.username
+            self.fields['candidate_email'].initial = self.instance.applicant.email
+
 class ApplicationForm(forms.ModelForm):
     job = forms.ModelChoiceField(queryset=Job.objects.all(), empty_label="Select a job", widget=forms.Select)
     
