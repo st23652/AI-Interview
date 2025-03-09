@@ -127,7 +127,7 @@ class Profile(models.Model):
     photo = models.ImageField(upload_to='profile_photos/', blank=True, null=True)
     experience = models.TextField(blank=True, null=True)
     phone = models.CharField(max_length=15, blank=True, null=True)
-    cv = models.FileField(upload_to='cvs/', blank=True, null=True)
+    resume = models.FileField(upload_to='resumes/', blank=True, null=True)
     
     # Employer fields
     company_name = models.CharField(max_length=255, blank=True)
@@ -312,7 +312,7 @@ class Job(models.Model):
 
 class CV(models.Model):
     file = models.FileField(upload_to='uploads/')
-    cv = models.FileField(upload_to='resumes/', validators=[validate_file])
+    resume = models.FileField(upload_to='resumes/', validators=[validate_file])
     job = models.ForeignKey(Job, on_delete=models.CASCADE)
     candidate_name = models.CharField(max_length=255)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
