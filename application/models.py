@@ -45,16 +45,6 @@ class InterviewResponse(models.Model):
     def __str__(self):
         return f'Response to Question {self.question.order}'
 
-=======
-from django.conf import settings
-from django.contrib.auth.models import AbstractUser, BaseUserManager
-from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from django.contrib.auth import get_user_model
-from .managers import CustomUserManager
-from django.core.exceptions import ValidationError
-
 class CVSubmission(models.Model):
     name = models.CharField(max_length=255)
     email = models.EmailField()
