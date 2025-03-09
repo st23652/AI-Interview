@@ -1,9 +1,9 @@
 # serializers.py
-import rest_framework
 from django.contrib.postgres import serializers
 
-from .models import Profile, Job, Application, Interview, Question, InterviewQuestion
 from .models import CustomUser
+from .models import Profile, Job, Application, Interview, Question, InterviewQuestion
+
 
 class CustomUserSerializer(serializers.BaseSerializer):
     class Meta:

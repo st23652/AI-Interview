@@ -1,6 +1,5 @@
 from django.contrib import admin
 from .models import Job, CustomUser
-from django.conf import settings
 from django.contrib.auth.admin import UserAdmin
 from .models import CVSubmission  # Import your model
 
