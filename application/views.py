@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.http import HttpResponse, JsonResponse
@@ -14,6 +13,7 @@ import openai
 from . import models
 from .forms import CVForm, CandidateProfileForm, JobApplicationForm, JobForm, ProfileForm, SettingsForm, InterviewScheduleForm, CustomUserCreationForm, InterviewForm, SkillAssessmentForm, UserRegistrationForm, YourForm
 from .forms import AnswerForm
+from .models import InterviewResponse
 from django.core.serializers.json import DjangoJSONEncoder
 import json
 from .serializers import ProfileSerializer
@@ -23,7 +23,7 @@ from openai import ChatCompletion
 from django.template.loader import render_to_string
 import spacy
 from pdfminer.high_level import extract_text
-from .forms import ResumeUploadForm
+from .forms import CVUploadForm
 from spacy.matcher import Matcher
 from rest_framework import viewsets
 from .serializers import InterviewSerializer, JobSerializer, CustomUserSerializer
@@ -186,7 +186,7 @@ def extract_information(text):
 
 def upload_resume(request):
     if request.method == 'POST':
-        form = ResumeUploadForm(request.POST, request.FILES)
+        form = CVUploadForm(request.POST, request.FILES)
         if form.is_valid():
             resume = form.save(commit=False)
             resume_text = parse_resume_text(resume.file.path)
@@ -202,7 +202,7 @@ def upload_resume(request):
             return redirect('resume_success')
 
     else:
-        form = ResumeUploadForm()
+        form = CVUploadForm()
     return render(request, 'upload_resume.html', {'form': form})
 
 def auto_interview(request):

@@ -333,7 +333,7 @@ class JobApplication(models.Model):
 class CVUpload(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     job = models.ForeignKey(Job, on_delete=models.CASCADE)
-    cv = models.FileField(upload_to='cvs/')
+    resume = models.FileField(upload_to='cvs/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
 class Application(models.Model):
