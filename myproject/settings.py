@@ -197,7 +197,3 @@ OPENAI_API_KEY=os.getenv("OPENAI_API_KEY")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-
-CSRF_COOKIE_SECURE = False
->>>>>>> origin/ai_feedback
