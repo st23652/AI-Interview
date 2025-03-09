@@ -49,7 +49,7 @@ class CVSubmission(models.Model):
     name = models.CharField(max_length=255)
     email = models.EmailField()
     job = models.ForeignKey('Job', on_delete=models.CASCADE)
-    cv_file = models.FileField(upload_to='cvs/')
+    resume = models.FileField(upload_to='resumes/')
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -315,7 +315,6 @@ class CV(models.Model):
     cv = models.FileField(upload_to='resumes/', validators=[validate_file])
     job = models.ForeignKey(Job, on_delete=models.CASCADE)
     candidate_name = models.CharField(max_length=255)
-    resume = models.FileField(upload_to='resumes/')
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
 
 class JobApplication(models.Model):
@@ -333,7 +332,7 @@ class JobApplication(models.Model):
 class CVUpload(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     job = models.ForeignKey(Job, on_delete=models.CASCADE)
-    resume = models.FileField(upload_to='cvs/')
+    resume = models.FileField(upload_to='resumes/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
 class Application(models.Model):
