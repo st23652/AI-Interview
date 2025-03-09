@@ -63,7 +63,7 @@ class SettingsForm(forms.ModelForm):
 class CVUploadForm(forms.ModelForm):
     class Meta:
         model = CVUpload
-        fields = ['CV']
+        fields = ['cv']
 
 class SkillForm(forms.ModelForm):
     class Meta:
