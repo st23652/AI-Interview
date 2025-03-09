@@ -1,12 +1,28 @@
 import json
-from myproject.settings import OPENAI_API_KEY
 import openai
 import speech_recognition as sr
 import whisper
 import spacy
+import pyttsx3  # Added for text-to-speech
 from PyPDF2 import PdfReader
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from the .env file
+load_dotenv()
+
+# Access the OPENAI_API_KEY
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 nlp = spacy.load('en_core_web_sm')
+
+# Initialize text-to-speech engine
+engine = pyttsx3.init()
+
+def synthesize_speech(text):
+    """Convert text to speech using pyttsx3."""
+    engine.say(text)
+    engine.runAndWait()
 
 def extract_text_from_cv(cv_file):
     """Extract text from PDF CV."""
@@ -112,53 +128,9 @@ def generate_interview_question(prompt):
     )
     return response.choices[0].text.strip()
 
-def generate_questions(cv, candidate_answers):
-    questions = []
-    
-    # Add 3 generic questions
-    questions.extend([
-        "Tell me about yourself.",
-        "What are your strengths?",
-        "Why do you want this job?"
-    ])
-    
-    # Analyze the CV and add questions
-    if cv:
-        if 'Python' in cv.skills:
-            questions.append("Describe your experience with Python.")
-        if 'leadership' in cv.experience:
-            questions.append("Tell us about a time you demonstrated leadership.")
-    
-    # Analyze candidate's previous answers for dynamic question generation
-    for answer in candidate_answers:
-        if "data analysis" in answer:
-            questions.append("Can you explain your process for data analysis?")
-        elif "teamwork" in answer:
-            questions.append("How do you approach working in a team?")
-    
-    # Ensure the total number of questions doesn't exceed 10
-    return questions[:10]
-
-def generate_follow_up_question(answer):
-    """Generate a follow-up question based on the candidate's response."""
-    # Simple example: You can expand this to use an LLM like GPT to analyze the answer and suggest a follow-up
-    if 'project' in answer.lower():
-        return "Can you elaborate on the project you mentioned and the role you played?"
-    elif 'team' in answer.lower():
-        return "How did you collaborate with your team on this task?"
-    else:
-        return "Can you provide more details on this?"
-
-def generate_questions_based_on_cv(cv_parsed_data):
-    """Generate custom questions based on CV data."""
-    questions = []
-    skills = cv_parsed_data.get('skills', [])
-    experience = cv_parsed_data.get('experience', [])
-
-    for skill in skills:
-        questions.append(f"How do you apply your {skill} skill in real-life scenarios?")
-    
-    for exp in experience:
-        questions.append(f"Can you describe your experience working at {exp}?")
-    
-    return questions[:7]  # Limit to 7 questions based on CV
+# Example usage
+if __name__ == "__main__":
+    question = "Describe your experience working with Python."
+    print("Question:", question)
+    print("Speaking the question...")
+    synthesize_speech(question)
