@@ -132,7 +132,7 @@ class JobApplicationForm(forms.ModelForm):
 
     class Meta:
         model = JobApplication
-        fields = ['job', 'resume', 'cover_letter', 'status']  # Do not include candidate_name and candidate_email here
+        fields = ['job', 'resume', 'cover_letter']  # Do not include candidate_name and candidate_email here
         widgets = {
             'cover_letter': forms.Textarea(attrs={'rows': 4}),
         }
