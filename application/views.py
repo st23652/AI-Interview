@@ -10,7 +10,6 @@ from django.contrib import messages
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.decorators.csrf import csrf_protect
-from .models import CandidateProfile, CandidateResponse, InterviewResponse
 from .utils import generate_follow_up_question, generate_questions_based_on_cv
 import openai
 from . import models
