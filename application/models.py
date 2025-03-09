@@ -1,4 +1,3 @@
-<<<<<<< HEAD:application/models.py
 from django.contrib.auth.models import BaseUserManager, AbstractUser
 from django.db import models
 from django.db.models.signals import post_save
@@ -56,7 +55,6 @@ from django.contrib.auth import get_user_model
 from .managers import CustomUserManager
 from django.core.exceptions import ValidationError
 
->>>>>>> origin/ai_feedback:myapp/models.py
 class CVSubmission(models.Model):
     name = models.CharField(max_length=255)
     email = models.EmailField()
@@ -82,11 +80,7 @@ def validate_file(value):
         raise ValidationError('Only PDF files are allowed.')
 
 class CustomUser(AbstractUser):
-<<<<<<< HEAD:application/models.py
-    ROLE_CHOICES = [
-=======
     USER_TYPE_CHOICES = [
->>>>>>> origin/ai_feedback:myapp/models.py
         ('candidate', 'Candidate'),
         ('employer', 'Employer'),
     ]
