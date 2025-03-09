@@ -1,7 +1,11 @@
-import unittest
 import os
-from unittest.mock import MagicMock, patch
-from myapp.cv_parser.cv_parser import is_allowed_file, save_file
+import sys
+import unittest
+from unittest.mock import MagicMock
+
+# Use a relative path or environment variable instead of hardcoding
+sys.path.append('C:/Users/5688s/OneDrive - University of Essex/AI-Interview')
+
 
 class TestFileUploader(unittest.TestCase):
     def setUp(self):
@@ -23,8 +27,12 @@ class TestFileUploader(unittest.TestCase):
     def test_save_file_valid(self):
         mock_file = MagicMock()
         mock_file.filename = "resume.pdf"
+        # Configure the mock to simulate saving behavior
+        mock_file.save.return_value = None  # Assuming save returns None when successful
 
         result = save_file(mock_file, self.upload_folder)
+        # Verify save was called with the correct path
+        mock_file.save.assert_called_once()
         self.assertTrue(os.path.exists(result))
 
     def test_save_file_invalid(self):
