@@ -100,7 +100,7 @@ class CustomUser(AbstractUser):
     is_employed = models.BooleanField(default=False)
     company_size = models.CharField(max_length=50, blank=True, null=True)
 
-    objects = CustomUserManager()
+    objects = BaseUserManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
