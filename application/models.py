@@ -1,9 +1,10 @@
 from django.contrib.auth.models import BaseUserManager, AbstractUser
-from django.db import models
+from . import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth import settings
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User  # Importing User model
 
 User = settings.AUTH_USER_MODEL
 
@@ -29,6 +30,7 @@ class Interview(models.Model):
     def __str__(self):
         return self.title
 
+
 class InterviewQuestion(models.Model):
     interview = models.ForeignKey(models.Interview, related_name='questions', on_delete=models.CASCADE)
     question_text = models.TextField()
@@ -37,6 +39,7 @@ class InterviewQuestion(models.Model):
     def __str__(self):
         return f'Question {self.order}: {self.question_text[:50]}'
 
+
 class InterviewResponse(models.Model):
     interview = models.ForeignKey(models.Interview, related_name='responses', on_delete=models.CASCADE)
     question = models.ForeignKey(models.InterviewQuestion, related_name='responses', on_delete=models.CASCADE)
@@ -44,6 +47,7 @@ class InterviewResponse(models.Model):
 
     def __str__(self):
         return f'Response to Question {self.question.order}'
+
 
 class CVSubmission(models.Model):
     name = models.CharField(max_length=255)
@@ -55,16 +59,18 @@ class CVSubmission(models.Model):
     def __str__(self):
         return self.name
 
+
 def validate_file(value):
     if not value.name.endswith('.pdf'):
         raise ValidationError('Only PDF files are allowed.')
+
 
 class CustomUser(AbstractUser):
     USER_TYPE_CHOICES = [
         ('candidate', 'Candidate'),
         ('employer', 'Employer'),
     ]
-    
+
     username = models.CharField(max_length=255, unique=True)
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
@@ -101,13 +107,14 @@ class CustomUser(AbstractUser):
     def some_function(self):
         # Function body here
         pass
-        
+
+
 class Profile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     is_candidate = models.BooleanField(default=False)
     is_employer = models.BooleanField(default=False)
-    
+
     # Candidate fields
     occupation = models.CharField(max_length=100, blank=True)
     date_of_birth = models.DateField(blank=True, null=True)
@@ -118,7 +125,7 @@ class Profile(models.Model):
     experience = models.TextField(blank=True, null=True)
     phone = models.CharField(max_length=15, blank=True, null=True)
     resume = models.FileField(upload_to='resumes/', blank=True, null=True)
-    
+
     # Employer fields
     company_name = models.CharField(max_length=255, blank=True)
     company_start_date = models.DateField(blank=True, null=True)
@@ -132,6 +139,7 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username
 
+
 class Question(models.Model):
     QUESTION_SET_CHOICES = [
         ('problem_solving', 'Problem Solving'),
@@ -143,6 +151,7 @@ class Question(models.Model):
     def __str__(self):
         return self.text
 
+
 class InterviewAnswer(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
@@ -152,9 +161,11 @@ class InterviewAnswer(models.Model):
     def __str__(self):
         return f"Answer to {self.question.text} by {self.user.username}"
 
+
 def get_custom_user_form():
     from .forms import CustomUserCreationForm
     return CustomUserCreationForm
+
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, password=None, **extra_fields):
@@ -177,10 +188,12 @@ class CustomUserManager(BaseUserManager):
 
         return self.create_user(email, username, password, **extra_fields)
 
+
 @receiver(post_save, sender=CustomUser)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
+
 
 @receiver(post_save, sender=CustomUser)
 def save_user_profile(sender, instance, **kwargs):
@@ -189,12 +202,14 @@ def save_user_profile(sender, instance, **kwargs):
     except Profile.DoesNotExist:
         pass
 
+
 # models.py
 class Sector(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
+
 
 class CandidateResponse(models.Model):
     candidate = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -203,6 +218,7 @@ class CandidateResponse(models.Model):
 
     def __str__(self):
         return f"{self.candidate.username} - {self.question.text[:50]}"
+
 
 class Employer(models.Model):
     COMPANY_SIZE_CHOICES = [
@@ -232,7 +248,7 @@ class Employer(models.Model):
         ('business', 'Business'),
         # Add more industries as needed
     ]
-    
+
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     company_name = models.CharField(max_length=255)
     start_date = models.DateField()
@@ -241,6 +257,7 @@ class Employer(models.Model):
 
     def __str__(self):
         return self.company_name
+
 
 class Candidate(models.Model):
     INDUSTRY_CHOICES = [
@@ -261,7 +278,7 @@ class Candidate(models.Model):
         ('business', 'Business'),
         # Add more industries as needed
     ]
-    
+
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     occupation = models.CharField(max_length=255)
     date_of_birth = models.DateField()
@@ -272,20 +289,22 @@ class Candidate(models.Model):
     def __str__(self):
         return self.user.username
 
+
 class Skill(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField()
 
     def __str__(self):
         return self.name
-    
+
+
 class Job(models.Model):
     JOB_TYPE_CHOICES = [
         ('full_time', 'Full-time'),
         ('part_time', 'Part-time'),
         ('contract', 'Contract'),
     ]
-    
+
     title = models.CharField(max_length=255)
     company_name = models.CharField(max_length=255)
     description = models.TextField()
@@ -300,12 +319,14 @@ class Job(models.Model):
     def __str__(self):
         return f"{self.title} at {self.company_name}"
 
+
 class CV(models.Model):
     file = models.FileField(upload_to='uploads/')
     resume = models.FileField(upload_to='resumes/', validators=[validate_file])
     job = models.ForeignKey(Job, on_delete=models.CASCADE)
     candidate_name = models.CharField(max_length=255)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+
 
 class JobApplication(models.Model):
     job = models.ForeignKey('Job', on_delete=models.CASCADE)
@@ -319,11 +340,13 @@ class JobApplication(models.Model):
     def __str__(self):
         return f"Application by {self.candidate_name} for {self.job.title}"
 
+
 class CVUpload(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     job = models.ForeignKey(Job, on_delete=models.CASCADE)
     resume = models.FileField(upload_to='resumes/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
+
 
 class Application(models.Model):
     job = models.ForeignKey(Job, on_delete=models.CASCADE)
@@ -334,6 +357,7 @@ class Application(models.Model):
     def __str__(self):
         return f"{self.candidate.user.username} - {self.job.title}"
 
+
 class Interview(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
@@ -341,13 +365,15 @@ class Interview(models.Model):
     interviewer = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='interviews_as_interviewer')
     scheduled_date = models.DateTimeField()
     status = models.CharField(max_length=20, choices=[('pending', 'Pending'), ('completed', 'Completed')])
-    question_set = models.CharField(max_length=20, choices=[('problem_solving', 'Problem Solving'), ('decision_making', 'Decision Making')])
+    question_set = models.CharField(max_length=20, choices=[('problem_solving', 'Problem Solving'),
+                                                            ('decision_making', 'Decision Making')])
     answers = models.JSONField(default=dict)  # Store answers as a dictionary
     feedback = models.TextField(blank=True, null=True)
     completed = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.candidate.username} - {self.interviewer.username} on {self.scheduled_date}"
+
 
 class SkillAssessment(models.Model):
     name = models.CharField(max_length=200)
@@ -356,6 +382,7 @@ class SkillAssessment(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class SkillAssessmentResult(models.Model):
     assessment = models.ForeignKey(SkillAssessment, on_delete=models.CASCADE)
