@@ -30,7 +30,7 @@ class Interview(models.Model):
         return self.title
 
 class InterviewQuestion(models.Model):
-    interview = models.ForeignKey('Interview', related_name='questions', on_delete=models.CASCADE)
+    interview = models.ForeignKey(Interview, related_name='questions', on_delete=models.CASCADE)
     question_text = models.TextField()
     order = models.PositiveIntegerField()
 
@@ -38,8 +38,8 @@ class InterviewQuestion(models.Model):
         return f'Question {self.order}: {self.question_text[:50]}'
 
 class InterviewResponse(models.Model):
-    interview = models.ForeignKey('Interview', related_name='responses', on_delete=models.CASCADE)
-    question = models.ForeignKey('InterviewQuestion', related_name='responses', on_delete=models.CASCADE)
+    interview = models.ForeignKey(Interview, related_name='responses', on_delete=models.CASCADE)
+    question = models.ForeignKey(InterviewQuestion, related_name='responses', on_delete=models.CASCADE)
     response_text = models.TextField()
 
     def __str__(self):
