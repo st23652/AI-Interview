@@ -1,5 +1,5 @@
 from django.contrib.auth.models import BaseUserManager, AbstractUser
-from django.db import models
+from . import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth import settings
@@ -10,8 +10,8 @@ User = settings.AUTH_USER_MODEL
 class Interview(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
-    candidate = models.ForeignKey(User, related_name='interviews', on_delete=models.CASCADE)
-    interviewer = models.ForeignKey(User, related_name='conducted_interviews', on_delete=models.CASCADE)
+    candidate = models.ForeignKey(models.User, related_name='interviews', on_delete=models.CASCADE)
+    interviewer = models.ForeignKey(models.User, related_name='conducted_interviews', on_delete=models.CASCADE)
     scheduled_date = models.DateTimeField()
     status = models.CharField(max_length=20, choices=(('scheduled', 'Scheduled'), ('completed', 'Completed')))
     question_set = models.CharField(
