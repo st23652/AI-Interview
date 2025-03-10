@@ -12,8 +12,8 @@ User = settings.AUTH_USER_MODEL
 class Interview(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
-    candidate = models.ForeignKey(application.User, related_name='interviews', on_delete=models.CASCADE)
-    interviewer = models.ForeignKey(application.User, related_name='conducted_interviews', on_delete=models.CASCADE)
+    candidate = models.ForeignKey(User, related_name='interviews', on_delete=models.CASCADE)
+    interviewer = models.ForeignKey(User, related_name='conducted_interviews', on_delete=models.CASCADE)
     scheduled_date = models.DateTimeField()
     status = models.CharField(max_length=20, choices=(('scheduled', 'Scheduled'), ('completed', 'Completed')))
     question_set = models.CharField(
