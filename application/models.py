@@ -9,9 +9,12 @@ from django.contrib.auth.models import User  # Importing User model
 User = settings.AUTH_USER_MODEL
 
 class Interview(models.Model):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    candidate = models.ForeignKey(User, related_name='interviews', on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     description = models.TextField()
-    candidate = models.ForeignKey(models.User, related_name='interviews', on_delete=models.CASCADE)
     interviewer = models.ForeignKey(models.User, related_name='conducted_interviews', on_delete=models.CASCADE)
     scheduled_date = models.DateTimeField()
     status = models.CharField(max_length=20, choices=(('scheduled', 'Scheduled'), ('completed', 'Completed')))
@@ -29,7 +32,6 @@ class Interview(models.Model):
 
     def __str__(self):
         return self.title
-
 
 class InterviewQuestion(models.Model):
     interview = models.ForeignKey(models.Interview, related_name='questions', on_delete=models.CASCADE)
