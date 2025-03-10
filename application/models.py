@@ -1,3 +1,5 @@
+from email.mime import application
+
 from django.contrib.auth.models import BaseUserManager, AbstractUser
 from django.db import models
 from django.db.models.signals import post_save
@@ -10,8 +12,8 @@ User = settings.AUTH_USER_MODEL
 class Interview(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
-    candidate = models.ForeignKey(User, related_name='interviews', on_delete=models.CASCADE)
-    interviewer = models.ForeignKey(User, related_name='conducted_interviews', on_delete=models.CASCADE)
+    candidate = models.ForeignKey(application.User, related_name='interviews', on_delete=models.CASCADE)
+    interviewer = models.ForeignKey(application.User, related_name='conducted_interviews', on_delete=models.CASCADE)
     scheduled_date = models.DateTimeField()
     status = models.CharField(max_length=20, choices=(('scheduled', 'Scheduled'), ('completed', 'Completed')))
     question_set = models.CharField(
@@ -30,7 +32,7 @@ class Interview(models.Model):
         return self.title
 
 class InterviewQuestion(models.Model):
-    interview = models.ForeignKey('Interview', related_name='questions', on_delete=models.CASCADE)
+    interview = models.ForeignKey(application.Interview, related_name='questions', on_delete=models.CASCADE)
     question_text = models.TextField()
     order = models.PositiveIntegerField()
 
@@ -38,8 +40,8 @@ class InterviewQuestion(models.Model):
         return f'Question {self.order}: {self.question_text[:50]}'
 
 class InterviewResponse(models.Model):
-    interview = models.ForeignKey('Interview', related_name='responses', on_delete=models.CASCADE)
-    question = models.ForeignKey('InterviewQuestion', related_name='responses', on_delete=models.CASCADE)
+    interview = models.ForeignKey(application.Interview, related_name='responses', on_delete=models.CASCADE)
+    question = models.ForeignKey(application.InterviewQuestion, related_name='responses', on_delete=models.CASCADE)
     response_text = models.TextField()
 
     def __str__(self):
@@ -55,16 +57,6 @@ class CVSubmission(models.Model):
     def __str__(self):
         return self.name
 
-class InterviewQuestion(models.Model):
-    # Define the fields for the model
-    interview = models.ForeignKey('Interview', on_delete=models.CASCADE)
-    question = models.TextField()
-    answer = models.TextField(blank=True, null=True)
-    # Add any other necessary fields
-
-    def __str__(self):
-        return self.question
-    
 def validate_file(value):
     if not value.name.endswith('.pdf'):
         raise ValidationError('Only PDF files are allowed.')
