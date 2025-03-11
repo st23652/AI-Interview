@@ -1,21 +1,21 @@
+from django.contrib.auth import settings
 from django.contrib.auth.models import BaseUserManager, AbstractUser
-from . import models
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth import settings
-from django.core.exceptions import ValidationError
-from django.contrib.auth.models import User  # Importing User model
 
-User = settings.AUTH_USER_MODEL
+user_User = settings.AUTH_USER_MODEL
 
 class Interview(models.Model):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    candidate = models.ForeignKey(User, related_name='interviews', on_delete=models.CASCADE)
+    candidate = models.ForeignKey(user_User, related_name='interviews', on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     description = models.TextField()
-    interviewer = models.ForeignKey(models.User, related_name='conducted_interviews', on_delete=models.CASCADE)
+    interviewer = models.ForeignKey(user_User, related_name='conducted_interviews', on_delete=models.CASCADE)
     scheduled_date = models.DateTimeField()
     status = models.CharField(max_length=20, choices=(('scheduled', 'Scheduled'), ('completed', 'Completed')))
     question_set = models.CharField(
@@ -33,8 +33,9 @@ class Interview(models.Model):
     def __str__(self):
         return self.title
 
+
 class InterviewQuestion(models.Model):
-    interview = models.ForeignKey(models.Interview, related_name='questions', on_delete=models.CASCADE)
+    interview = models.ForeignKey('Interview', related_name='questions', on_delete=models.CASCADE)
     question_text = models.TextField()
     order = models.PositiveIntegerField()
 
@@ -43,8 +44,8 @@ class InterviewQuestion(models.Model):
 
 
 class InterviewResponse(models.Model):
-    interview = models.ForeignKey(models.Interview, related_name='responses', on_delete=models.CASCADE)
-    question = models.ForeignKey(models.InterviewQuestion, related_name='responses', on_delete=models.CASCADE)
+    interview = models.ForeignKey('Interview', related_name='responses', on_delete=models.CASCADE)
+    question = models.ForeignKey('InterviewQuestion', related_name='responses', on_delete=models.CASCADE)
     response_text = models.TextField()
 
     def __str__(self):
