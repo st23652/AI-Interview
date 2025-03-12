@@ -25,3 +25,4 @@ AI-Interview
 **.sqlite**
 **migrations**
 .env
+.qodo

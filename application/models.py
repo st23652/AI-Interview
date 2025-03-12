@@ -386,7 +386,6 @@ class SkillAssessment(models.Model):
     def __str__(self):
         return self.name
 
-
 class SkillAssessmentResult(models.Model):
     assessment = models.ForeignKey(SkillAssessment, on_delete=models.CASCADE)
     candidate = models.ForeignKey(Profile, on_delete=models.CASCADE)

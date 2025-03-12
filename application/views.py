@@ -85,11 +85,9 @@ class JobViewSet(viewsets.ModelViewSet):
     queryset = models.Job.objects.all()
     serializer_class = JobSerializer
 
-
 class InterviewViewSet(viewsets.ModelViewSet):
     queryset = models.Interview.objects.all()
     serializer_class = InterviewSerializer
-
 
 @login_required
 def dashboard_redirect(request):
@@ -825,7 +823,6 @@ def edit_profile(request):
 def interview_schedule(request):
     # Placeholder logic for scheduling interviews
     return render(request, 'interview_schedule.html')
-
 
 @login_required
 def interview(request, interview_id):
