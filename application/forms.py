@@ -10,6 +10,7 @@ from .models import CV, InterviewResponse, CustomUser, JobApplication
 class InterviewFeedbackForm(forms.ModelForm):
     class Meta:
         model = Interview
+        abstract = True
         fields = ['feedback']  # Assuming `feedback` is a field in the Interview model
         widgets = {
             'feedback': forms.Textarea(attrs={'rows': 4, 'cols': 40}),

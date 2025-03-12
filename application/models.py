@@ -32,7 +32,7 @@ class Interview(models.Model):
 
     def __str__(self):
         return self.title
-
+    pass
 
 class InterviewQuestion(models.Model):
     interview = models.ForeignKey('Interview', related_name='questions', on_delete=models.CASCADE)
@@ -359,24 +359,6 @@ class Application(models.Model):
 
     def __str__(self):
         return f"{self.candidate.user.username} - {self.job.title}"
-
-
-class Interview(models.Model):
-    title = models.CharField(max_length=100)
-    description = models.TextField()
-    candidate = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='interviews_as_candidate')
-    interviewer = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='interviews_as_interviewer')
-    scheduled_date = models.DateTimeField()
-    status = models.CharField(max_length=20, choices=[('pending', 'Pending'), ('completed', 'Completed')])
-    question_set = models.CharField(max_length=20, choices=[('problem_solving', 'Problem Solving'),
-                                                            ('decision_making', 'Decision Making')])
-    answers = models.JSONField(default=dict)  # Store answers as a dictionary
-    feedback = models.TextField(blank=True, null=True)
-    completed = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"{self.candidate.username} - {self.interviewer.username} on {self.scheduled_date}"
-
 
 class SkillAssessment(models.Model):
     name = models.CharField(max_length=200)
