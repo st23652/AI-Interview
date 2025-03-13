@@ -49,7 +49,7 @@
                     <p><strong>Experience Needed:</strong> {{ job.experience }} years</p>
                     <p><strong>Job Type:</strong> {{ job.get_job_type_display }}</p>
                     <p><strong>Salary:</strong> ${{ job.salary }}</p>
-                    <p><strong>Deadline:</strong> {{ job.deadline|date:"F j, Y" }}</p>
+                    <p><strong>Deadline:</strong> {{ job.deadline|date}}"F j, Y" }}</p>
       </li>
             {% empty %}
                 <li>No job postings available.</li>

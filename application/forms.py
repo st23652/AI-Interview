@@ -16,7 +16,7 @@ class SentimentAnalysisForm(forms.Form):
     analysis_type = forms.ChoiceField(choices=ANALYSIS_CHOICES, widget=forms.RadioSelect, required=True)
     interview_question = forms.CharField(max_length=500, required=False, widget=forms.TextInput(attrs={'placeholder': 'Enter Interview Question'}))
     interview_answer = forms.CharField(widget=forms.Textarea(attrs={'placeholder': 'Enter Your Answer'}), required=False)
-    cv_file = forms.FileField(required=False)
+    resume = forms.FileField(required=False)
 
 class EmailAuthenticationForm(AuthenticationForm):
     username = forms.EmailField(label="Email", widget=forms.EmailInput(attrs={"autofocus": True}))
@@ -73,7 +73,7 @@ class EmployerForm(forms.ModelForm):
 class SettingsForm(forms.ModelForm):
     class Meta:
         model = CustomUser
-        fields = ['username', 'email', 'phone_number', 'bio', 'linkedin', 'github']
+        fields = ['username', 'email', 'phone', 'bio', 'linkedin', 'github']
 
 class CVUploadForm(forms.ModelForm):
     class Meta:
@@ -113,7 +113,7 @@ class CustomUserCreationForm(UserCreationForm):
 
     class Meta:
         model = CustomUser
-        fields = ['username', 'email', 'phone_number', 'bio', 'linkedin', 'github', 'user_type', 'password']
+        fields = ['username', 'email', 'phone', 'bio', 'linkedin', 'github', 'user_type', 'password']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -180,12 +180,12 @@ class UserRegistrationForm(forms.ModelForm):
     employer_industry = forms.CharField(required=False)
     starting_date = forms.DateField(required=False)
     company_size = forms.ChoiceField(choices=Employer.COMPANY_SIZE_CHOICES, required=False)
-    phone_number = forms.CharField(required=True)
+    phone = forms.CharField(required=True)
     profile_picture = forms.ImageField(required=False)
 
     class Meta:
         model = CustomUser
-        fields = ['username', 'email', 'password', 'confirm_password', 'user_type', 'phone_number', 'profile_picture']
+        fields = ['username', 'email', 'password', 'confirm_password', 'user_type', 'phone', 'profile_picture']
 
     def clean(self):
         cleaned_data = super().clean()
@@ -254,13 +254,13 @@ class ProfilePictureForm(forms.ModelForm):
 
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
-    phone_number = forms.CharField(required=True)
+    phone = forms.CharField(required=True)
     country_code = forms.ChoiceField(choices=[('+1', 'US'), ('+44', 'UK')])  # Example choices
     user_type = forms.ChoiceField(choices=[('candidate', 'Candidate'), ('employer', 'Employer')])
     occupation = forms.CharField(required=False)
     candidate_industry = forms.CharField(required=False)
     experience = forms.IntegerField(required=False)
-    CV = forms.FileField(required=False)
+    resume = forms.FileField(required=False)
     company = forms.CharField(required=False)
     employer_industry = forms.CharField(required=False)
     years_open = forms.IntegerField(required=False)

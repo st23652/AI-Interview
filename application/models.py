@@ -5,6 +5,10 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from application.managers import CustomUserManager
+import phonenumbers
+from phonenumbers import NumberParseException  # Correct import
+from phonenumbers import PhoneNumberFormat
 
 user_User = settings.AUTH_USER_MODEL
 
@@ -74,9 +78,12 @@ class CustomUser(AbstractUser):
         ('employer', 'Employer'),
     ]
 
+    user_profile = models.OneToOneField(
+        'Profile', on_delete=models.CASCADE, null=True, blank=True, related_name='user_profile'
+    )
     username = models.CharField(max_length=255, unique=True)
     email = models.EmailField(unique=True)
-    phone_number = models.CharField(max_length=20, blank=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)
     date_of_birth = models.DateField(null=True, blank=True)
     bio = models.TextField(blank=True, null=True)
     linkedin = models.URLField(blank=True, null=True)
@@ -99,7 +106,7 @@ class CustomUser(AbstractUser):
     is_employed = models.BooleanField(default=False)
     company_size = models.CharField(max_length=50, blank=True, null=True)
 
-    objects = BaseUserManager()
+    objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
@@ -111,9 +118,10 @@ class CustomUser(AbstractUser):
         # Function body here
         pass
 
-
 class Profile(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        CustomUser, on_delete=models.CASCADE, related_name='profile'
+    )
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     is_candidate = models.BooleanField(default=False)
     is_employer = models.BooleanField(default=False)
@@ -126,8 +134,19 @@ class Profile(models.Model):
     current_company = models.CharField(max_length=255, blank=True)
     photo = models.ImageField(upload_to='profile_photos/', blank=True, null=True)
     experience = models.TextField(blank=True, null=True)
+    resume = models.FileField(upload_to='resumes/', blank=True, null=True)  # Check this line
     phone = models.CharField(max_length=15, blank=True, null=True)
-    resume = models.FileField(upload_to='resumes/', blank=True, null=True)
+
+    def clean(self):
+        super().clean()
+        if self.phone:
+            try:
+                parsed_number = phonenumbers.parse(self.phone, None)
+                if not phonenumbers.is_valid_number(parsed_number):
+                    raise ValueError("Invalid phone number")
+                self.phone = phonenumbers.format_number(parsed_number, phonenumbers.PhoneNumberFormat.E164)
+            except NumberParseException:
+                raise ValueError("Invalid phone number format")
 
     # Employer fields
     company_name = models.CharField(max_length=255, blank=True)
@@ -142,6 +161,14 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username
 
+    def save(self, *args, **kwargs):
+        # your profile save logic, for example, checking if the profile has changed.
+        super().save(*args, **kwargs)
+
+@receiver(post_save, sender=CustomUser)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
 
 class Question(models.Model):
     QUESTION_SET_CHOICES = [
@@ -190,21 +217,6 @@ class CustomUserManager(BaseUserManager):
             raise ValueError('Superuser must have is_superuser=True.')
 
         return self.create_user(email, username, password, **extra_fields)
-
-
-@receiver(post_save, sender=CustomUser)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
-
-
-@receiver(post_save, sender=CustomUser)
-def save_user_profile(sender, instance, **kwargs):
-    try:
-        instance.profile.save()
-    except Profile.DoesNotExist:
-        pass
-
 
 # models.py
 class Sector(models.Model):

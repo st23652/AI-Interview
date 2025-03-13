@@ -14,7 +14,7 @@ class CustomUserAdmin(UserAdmin):
     model = CustomUser
     list_display = ('username', 'email', 'is_employer', 'is_candidate', 'company_name', 'industry')
     fieldsets = UserAdmin.fieldsets + (
-        (None, {'fields': ('is_employer', 'is_candidate', 'company_name', 'industry', 'starting_date', 'company_size', 'phone_number', 'occupation', 'date_of_birth', 'is_employed')}),
+        (None, {'fields': ('is_employer', 'is_candidate', 'company_name', 'industry', 'starting_date', 'company_size', 'phone', 'occupation', 'date_of_birth', 'is_employed')}),
     )
 
 # Register your model

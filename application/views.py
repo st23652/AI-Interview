@@ -19,7 +19,7 @@ from . import models
 from .forms import CVForm, CandidateProfileForm, JobApplicationForm, JobForm, ProfileForm, SettingsForm, \
     InterviewScheduleForm, CustomUserCreationForm, InterviewForm, SkillAssessmentForm, UserRegistrationForm, YourForm
 from .forms import AnswerForm
-from .models import InterviewResponse, Candidate
+from .models import InterviewResponse, Candidate, Job
 from django.core.serializers.json import DjangoJSONEncoder
 import json
 from .serializers import ProfileSerializer
@@ -38,6 +38,7 @@ import os
 from dotenv import load_dotenv
 from application.ai_feedback.analyzers import InternalSentimentAnalyzer
 from .forms import SentimentAnalysisForm
+from .forms import EmailAuthenticationForm  # Import the custom form
 
 UPLOAD_FOLDER = "uploads"
 
@@ -120,8 +121,6 @@ def analyze_sentiment(request):
     return render(request, "analyze.html", {"form": form})
 
 load_dotenv()
-
-from .forms import EmailAuthenticationForm  # Import the custom form
 
 def user_login(request):
     if request.method == 'POST':
@@ -476,7 +475,7 @@ def save_answers(request, interview_id):
     return JsonResponse({'error': 'Invalid request method.'}, status=405)
 
 
-def profile_view(request):
+def profile(request):
     profile = request.user.profile  # Assuming the user has a one-to-one relationship with the Profile model
 
     if request.method == 'POST':
@@ -977,10 +976,22 @@ def job_application_list(request):
 
 @login_required
 def job_postings(request):
-    if request.method == 'GET':
-        jobs = models.Job.objects.all()
-        return render(request, 'job_postings.html', {'jobs': jobs})
+    jobs = Job.objects.all()  # Get all job postings
 
+    if request.user.profile.is_employer:  # Employer can post jobs
+        if request.method == "POST":
+            form = JobForm(request.POST)
+            if form.is_valid():
+                job = form.save(commit=False)
+                job.posted_by = request.user
+                job.save()
+                return redirect('job_postings')
+        else:
+            form = JobForm()
+    else:
+        form = None  # Candidates don't see the form
+
+    return render(request, "job_postings.html", {"jobs": jobs, "form": form})
 
 def update_settings(request):
     # Logic to update settings goes here

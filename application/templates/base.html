@@ -5,37 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}AI Interviewer{% endblock %}</title>
     {% block head %}
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'styles.css' %}">
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'styles.css' %}">
     {% endblock %}
 </head>
 <body>
-    <!-- Header Section -->
-    <header>
-        <div class="container">
-            <h1><a href="{% url 'home' %}">AI Interviewer</a></h1>
-            <nav>
-                <ul>
-                    <li><a href="{% url 'home' %}">Home</a></li>
-                    {% if user.is_authenticated %}
-                        {% if user.profile.is_employer %}
-                            {% include 'header_e.html' %}
-                        {% elif user.profile.is_candidate %}
-                            {% include 'header_c.html' %}
-                        {% endif %}
-                        <li><a href="{% url 'profile' %}">Profile</a></li>
-                        <li><a href="{% url 'logout' %}">Logout</a></li>
-                    {% else %}
-                        <li><a href="{% url 'user_login' %}">Login</a></li>
-                        <li><a href="{% url 'register_view' %}">Register</a></li>
-                    {% endif %}
-                </ul>
-            </nav>
-        </div>
-    </header>
+<!-- Header Section -->
+<header>
+    <div class="container">
+        <h1><a href="{% url 'home' %}">AI Interviewer</a></h1>
+        <nav>
+            <ul>
+                <li><a href="{% url 'home' %}">Home</a></li>
 
-    <!-- Flash Messages Section -->
-    {% block messages %}
+                {% if user.is_authenticated %}
+                    {% if user.profile and user.profile.is_employer %}
+                        <li><a href="{% url 'employer_dashboard' %}">Dashboard</a></li>
+                        <li><a href="{% url 'job_postings' %}">Post Job</a></li>
+                        <li><a href="{% url 'candidates' %}">Candidates</a></li>
+                        <li><a href="{% url 'interviews' %}">Interviews</a></li>
+                    {% elif user.profile and user.profile.is_candidate %}
+                        <li><a href="{% url 'candidate_dashboard' %}">Dashboard</a></li>
+                        <li><a href="{% url 'job_list' %}">Job Listings</a></li>
+                        <li><a href="{% url 'interview_schedule' %}">Interview Status</a></li>
+                        <li><a href="{% url 'skill_assessment_list' %}">Skill Assessments</a></li>
+                    {% endif %}
+                    <li><a href="{% url 'profile' %}">Profile</a></li>
+                    <li><a href="{% url 'logout' %}">Logout</a></li>
+                {% else %}
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                    <li><a href="{% url 'register_view' %}">Register</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<!-- Flash Messages Section -->
+{% block messages %}
     {% if messages %}
         <div class="messages-container">
             {% for message in messages %}
@@ -43,22 +50,22 @@
             {% endfor %}
         </div>
     {% endif %}
-    {% endblock %}
+{% endblock %}
 
-    <!-- Main Content Section -->
-    <main>
-        <div class="content-container">
-            {% block content %}
+<!-- Main Content Section -->
+<main>
+    <div class="content-container">
+        {% block content %}
             <!-- Child templates inject content here -->
-            {% endblock %}
-        </div>
-    </main>
+        {% endblock %}
+    </div>
+</main>
 
-    <!-- Footer Section -->
-    <footer>
-        <div class="container">
-            <p>&copy; {{ now|date}}{{"Y"}} AI Interviewer. All rights reserved.</p>
-        </div>
-    </footer>
+<!-- Footer Section -->
+<footer>
+    <div class="container">
+        <p>&copy; {% now "Y" %} AI Interviewer. All rights reserved.</p>
+    </div>
+</footer>
 </body>
 </html>
