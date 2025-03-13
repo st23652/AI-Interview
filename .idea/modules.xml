@@ -1,34 +1,8 @@
-<<<<<<< HEAD
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-<<<<<<<<< Temporary merge branch 1
-      <module fileurl="file://$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/java/10 resources/10 resources.iml" filepath="$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/java/10 resources/10 resources.iml" />
-      <module fileurl="file://$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/java/2 subdir/2 subdir.iml" filepath="$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/java/2 subdir/2 subdir.iml" />
-      <module fileurl="file://$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/java/7 linking/7 linking.iml" filepath="$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/java/7 linking/7 linking.iml" />
-      <module fileurl="file://$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/java/9 jni/9 jni.iml" filepath="$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/java/9 jni/9 jni.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/myproject.iml" filepath="$PROJECT_DIR$/.idea/myproject.iml" />
-      <module fileurl="file://$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/java/test cases.iml" filepath="$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/java/test cases.iml" />
-      <module fileurl="file://$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/unit/unit.iml" filepath="$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/unit/unit.iml" />
-=========
       <module fileurl="file://$PROJECT_DIR$/.idea/AI-Interview.iml" filepath="$PROJECT_DIR$/.idea/AI-Interview.iml" />
->>>>>>>>> Temporary merge branch 2
     </modules>
   </component>
-=======
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="ProjectModuleManager">
-    <modules>
-      <module fileurl="file://$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/java/10 resources/10 resources.iml" filepath="$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/java/10 resources/10 resources.iml" />
-      <module fileurl="file://$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/java/2 subdir/2 subdir.iml" filepath="$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/java/2 subdir/2 subdir.iml" />
-      <module fileurl="file://$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/java/7 linking/7 linking.iml" filepath="$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/java/7 linking/7 linking.iml" />
-      <module fileurl="file://$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/java/9 jni/9 jni.iml" filepath="$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/java/9 jni/9 jni.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/myproject.iml" filepath="$PROJECT_DIR$/.idea/myproject.iml" />
-      <module fileurl="file://$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/java/test cases.iml" filepath="$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/java/test cases.iml" />
-      <module fileurl="file://$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/unit/unit.iml" filepath="$PROJECT_DIR$/numpy-2.1.1/numpy-2.1.1/vendored-meson/meson/test cases/unit/unit.iml" />
-    </modules>
-  </component>
->>>>>>> origin/ai_feedback
 </project>

@@ -34,6 +34,27 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+from .forms import EmailAuthenticationForm  # Import the custom form
+
+def user_login(request):
+    if request.method == 'POST':
+        form = EmailAuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            email = form.cleaned_data.get('username')  # Now username is actually email
+            password = form.cleaned_data.get('password')
+
+            # Authenticate the user using email
+            user = authenticate(request, username=email, password=password)  # username=email is required
+
+            if user is not None:
+                login(request, user)
+                return redirect('home')  # Redirect to home or another page
+            else:
+                messages.error(request, "Invalid email or password.")
+    else:
+        form = EmailAuthenticationForm()
+
+    return render(request, 'login.html', {'form': form})
 
 def fetch_questions(request, interview_id):
     interview = models.Interview.objects.get(id=interview_id)
@@ -603,7 +624,7 @@ def my_protected_view(request):
         form = YourForm()
     return render(request, 'your_template.html', {'form': form})
 
-
+@csrf_exempt
 def register_view(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST, request.FILES)
@@ -615,7 +636,6 @@ def register_view(request):
     else:
         form = UserRegistrationForm()
     return render(request, 'register.html', {'form': form})
-
 
 def csrf_failure(request, reason=""):
     return render(request, '403_csrf.html', status=403)
@@ -640,33 +660,8 @@ def update_settings(request):
     else:
         form = SettingsForm(instance=request.user)
     return render(request, 'settings.html', {'form': form})
-
-
 def home(request):
     return render(request, 'home.html')
-
-
-def user_login(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            email = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-
-            # Authenticate the user using email
-            user = authenticate(request, email=email, password=password)
-
-            if user is not None:
-                login(request, user)
-                return redirect('home')  # Redirect to home or another page
-            else:
-                messages.error(request, "Invalid email or password.")
-                return render(request, 'login.html', {'form': form})
-    else:
-        form = AuthenticationForm()
-
-    return render(request, 'login.html', {'form': form})
-
 
 def candidate_home(request):
     return render(request, 'candidate_home.html')

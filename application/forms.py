@@ -5,7 +5,10 @@ from .models import CVUpload
 from .models import Candidate, Employer
 from .models import Interview  # Import your Interview model
 from .models import CV, InterviewResponse, CustomUser, JobApplication
+from django.contrib.auth.forms import AuthenticationForm
 
+class EmailAuthenticationForm(AuthenticationForm):
+    username = forms.EmailField(label="Email", widget=forms.EmailInput(attrs={"autofocus": True}))
 
 class InterviewFeedbackForm(forms.ModelForm):
     class Meta:

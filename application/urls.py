@@ -2,6 +2,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include
 from . import views
+from .cv_parser.cv_parser import upload_files
 from .views import get_next_question, save_answers
 from rest_framework.routers import SimpleRouter
 
@@ -13,6 +14,7 @@ router.register(r'users', views.JobViewSet)
 urlpatterns = [
     path('api/', include(router.urls)),  # Add prefix to avoid collision with other paths
     path('home/', views.home, name='home'),  # Adjusted 'home' path to prevent recursion
+    path('upload/', upload_files, name='upload_files'),
     path('candidate/home/', views.candidate_home, name='candidate_home'),
     path('employer/home/', views.employer_home, name='employer_home'),
     path('interviews/<int:interview_id>/questions/', views.fetch_questions, name='fetch_questions'),
@@ -23,9 +25,9 @@ urlpatterns = [
     path('employer/dashboard/', views.employer_dashboard, name='employer_dashboard'),
     path('privacy/', views.privacy, name='privacy'),
     path('terms/', views.terms, name='terms'),
-    path('register/', views.register_view, name='register'),
+    path('register/', views.register_view, name='register_view'),
     path('auto-interview/', views.auto_interview, name='auto_interview'),
-    path('login/', views.user_login, name='login'),
+    path('login/', views.user_login, name='user_login'),
     path('logout/', views.logout_view, name='logout'),
     path('profile/', views.profile_view, name='profile'),
     path('job/create/', views.job_create, name='job_create'),
