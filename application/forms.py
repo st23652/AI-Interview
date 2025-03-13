@@ -7,6 +7,17 @@ from .models import Interview  # Import your Interview model
 from .models import CV, InterviewResponse, CustomUser, JobApplication
 from django.contrib.auth.forms import AuthenticationForm
 
+class SentimentAnalysisForm(forms.Form):
+    ANALYSIS_CHOICES = [
+        ("cv", "Analyze CV"),
+        ("interview", "Analyze Interview Answer"),
+    ]
+
+    analysis_type = forms.ChoiceField(choices=ANALYSIS_CHOICES, widget=forms.RadioSelect, required=True)
+    interview_question = forms.CharField(max_length=500, required=False, widget=forms.TextInput(attrs={'placeholder': 'Enter Interview Question'}))
+    interview_answer = forms.CharField(widget=forms.Textarea(attrs={'placeholder': 'Enter Your Answer'}), required=False)
+    cv_file = forms.FileField(required=False)
+
 class EmailAuthenticationForm(AuthenticationForm):
     username = forms.EmailField(label="Email", widget=forms.EmailInput(attrs={"autofocus": True}))
 

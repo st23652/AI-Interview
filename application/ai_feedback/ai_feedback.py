@@ -3,6 +3,8 @@ import re
 import openai
 from django.conf import settings
 
+from application.ai_feedback.analyzers import InternalSentimentAnalyzer
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 

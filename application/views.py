@@ -1,4 +1,7 @@
+from PyPDF2 import PdfReader
 from django.conf import settings
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
@@ -10,6 +13,8 @@ from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.decorators.csrf import csrf_protect
 import openai
+from docx2txt import docx2txt
+
 from . import models
 from .forms import CVForm, CandidateProfileForm, JobApplicationForm, JobForm, ProfileForm, SettingsForm, \
     InterviewScheduleForm, CustomUserCreationForm, InterviewForm, SkillAssessmentForm, UserRegistrationForm, YourForm
@@ -31,6 +36,88 @@ from .serializers import InterviewSerializer, JobSerializer, CustomUserSerialize
 from .forms import InterviewFeedbackForm
 import os
 from dotenv import load_dotenv
+from application.ai_feedback.analyzers import InternalSentimentAnalyzer
+from .forms import SentimentAnalysisForm
+
+UPLOAD_FOLDER = "uploads"
+
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+def analyze_page(request):
+    return render(request, 'analyze.html')
+
+def analyze_cv(request):
+    return render(request, 'analyze_cv.html')
+
+def analyze_interview(request):
+    return render(request, 'analyze_interview.html')
+
+def extract_text_from_file(file_path):
+    """Extracts text from PDF or DOCX files."""
+    if file_path.endswith(".pdf"):
+        try:
+            reader = PdfReader(file_path)
+            return " ".join([page.extract_text() for page in reader.pages if page.extract_text()])
+        except Exception as e:
+            return f"Error reading PDF: {e}"
+    elif file_path.endswith(".docx"):
+        try:
+            return docx2txt.process(file_path)
+        except Exception as e:
+            return f"Error reading DOCX: {e}"
+    return "Unsupported file format"
+
+def analyze_sentiment(request):
+    """Handles sentiment analysis for CV or interview answer."""
+    if request.method == "POST":
+        form = SentimentAnalysisForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            analysis_type = form.cleaned_data["analysis_type"]
+
+            if analysis_type == "cv":
+                cv_file = request.FILES.get("cv_file")
+                if not cv_file:
+                    return JsonResponse({"error": "Please upload a CV file."}, status=400)
+
+                cv_path = os.path.join(UPLOAD_FOLDER, cv_file.name)
+                default_storage.save(cv_path, ContentFile(cv_file.read()))
+                cv_text = extract_text_from_file(cv_path)
+
+                if "Error" in cv_text:
+                    return JsonResponse({"error": cv_text}, status=500)
+
+                analyzer = InternalSentimentAnalyzer()
+                result = analyzer.analyze(cv_text)
+
+                return JsonResponse({
+                    "analysis_type": "CV",
+                    "score": result["score"],
+                    "sentiment": result["sentiment"],
+                })
+
+            elif analysis_type == "interview":
+                question = form.cleaned_data["interview_question"]
+                answer = form.cleaned_data["interview_answer"]
+
+                if not question or not answer:
+                    return JsonResponse({"error": "Please enter both question and answer."}, status=400)
+
+                combined_text = f"Question: {question}\nAnswer: {answer}"
+                analyzer = InternalSentimentAnalyzer()
+                result = analyzer.analyze(combined_text)
+
+                return JsonResponse({
+                    "analysis_type": "Interview Answer",
+                    "score": result["score"],
+                    "sentiment": result["sentiment"],
+                })
+
+    else:
+        form = SentimentAnalysisForm()
+
+    return render(request, "analyze.html", {"form": form})
 
 load_dotenv()
 
@@ -168,7 +255,7 @@ def dashboard(request):
         return render(request, 'employer_dashboard.html')
     elif request.user.is_candidate:
         return render(request, 'candidate_dashboard.html')
-    return redirect('login')
+    return redirect('user_login')
 
 
 def some_view(request):

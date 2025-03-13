@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyze Options</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        .container { max-width: 400px; margin: auto; }
+        .button { display: block; margin: 10px auto; padding: 15px; background: #007BFF; color: white; border: none; cursor: pointer; text-decoration: none; }
+        .button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>What would you like to analyze?</h2>
+    <a href="{% url 'analyze_cv' %}" class="button">Analyze CV</a>
+    <a href="{% url 'analyze_interview' %}" class="button">Analyze Interview Answers</a>
+</div>
+
+</body>
+</html>

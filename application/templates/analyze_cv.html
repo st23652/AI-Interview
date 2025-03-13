@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyze CV</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        .container { max-width: 400px; margin: auto; }
+        .button { padding: 10px; background: #007BFF; color: white; border: none; cursor: pointer; }
+        .button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Upload CV for Analysis</h2>
+    <form action="{% url 'upload_files' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="cv" required><br><br>
+        <input type="file" name="jd" required><br><br>
+        <button type="submit" class="button">Analyze CV</button>
+    </form>
+    <br>
+    <a href="{% url 'analyze_page' %}">Back</a>
+</div>
+
+</body>
+</html>
