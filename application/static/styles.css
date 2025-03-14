@@ -1,101 +1,122 @@
-/* General body styling */
-.profile-picture {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: scale-down;
-}
-
-@media (max-width: 600px) {
-    .profile-picture {
-        width: 100px;
-        height: 100px;
-    }
+/* Reset & General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4; /* Light grey background color */
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
+    background-color: #f4f4f4;
+    height: 100vh; /* Full viewport height */
     display: flex;
     flex-direction: column;
 }
 
+/* Wrapper for full-page layout */
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ensures full-page height */
+}
+
 /* Header styling */
 header {
-    background-color: #333; /* Dark background color */
-    color: #fff; /* White text color */
-    padding: 10px 0;
+    background-color: #333;
+    color: #fff;
+    padding: 15px 0;
     text-align: center;
 }
 
 header a {
-    color: #fff; /* White text color for links */
+    color: #fff;
     text-decoration: none;
     padding: 10px;
-    font-size: 16px;
+    font-size: 18px;
 }
 
 header a:hover {
-    background-color: #555; /* Darker background color on hover */
+    background-color: #555;
 }
 
-/* Footer styling */
-footer {
-    background-color: #333; /* Dark background color */
-    color: #fff; /* White text color */
-    padding: 10px 0;
-    text-align: center;
-    padding: 10px 0;
-    position: fixed;
-    width: 100%;
-    margin-top: auto; /* Push the footer to the bottom */
-}
-
-/* Navigation bar styling */
+/* Navigation Bar */
 nav {
-    background-color: #444; /* Darker background color for nav */
-    color: #fff; /* White text color */
+    background-color: #444;
 }
 
 nav ul {
     list-style: none;
-    margin: 0;
-    padding: 0;
     display: flex;
     justify-content: center;
+    padding: 0;
 }
 
 nav ul li {
-    margin: 0;
+    margin: 0 10px;
 }
 
 nav ul li a {
-    color: #fff; /* White text color for nav links */
+    color: #fff;
     text-decoration: none;
-    padding: 15px;
+    padding: 12px;
     display: block;
 }
 
 nav ul li a:hover {
-    background-color: #555; /* Darker background color on hover */
+    background-color: #555;
 }
 
-/* Main content area */
+/* Main Content */
 main {
+    flex: 1; /* Takes up available space */
     padding: 20px;
-    flex: 1; /* Allow the main content area to grow and take up space */
 }
 
-#candidate_fields, #employer_fields {
-    display: none; /* Ensure fields are shown/hidden dynamically by JavaScript */
+/* Footer fixed at bottom */
+footer {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 15px 0;
+    width: 100%;
+    margin-top: auto; /* Pushes footer to the bottom */
 }
 
-.profile-pic {
-    width: 3px;    /* Smaller width */
-    height: 3px;   /* Smaller height */
-    border-radius: 50%; /* Make the image circular */
+/* Flash Messages */
+.messages-container {
+    text-align: center;
+    margin: 10px auto;
 }
 
+.alert {
+    padding: 10px;
+    margin: 5px auto;
+    width: 80%;
+    border-radius: 5px;
+}
+
+.alert.success {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.alert.error {
+    background-color: #f44336;
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    header {
+        padding: 10px 0;
+    }
+
+    nav ul {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    nav ul li {
+        margin: 5px 0;
+    }
+}

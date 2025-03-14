@@ -954,23 +954,19 @@ def job_application_list(request):
 
 
 @login_required
+
 def job_postings(request):
-    jobs = Job.objects.all()  # Get all job postings
-
-    if request.user.profile.is_employer:  # Employer can post jobs
-        if request.method == "POST":
-            form = JobForm(request.POST)
-            if form.is_valid():
-                job = form.save(commit=False)
-                job.posted_by = request.user
-                job.save()
-                return redirect('job_postings')
+    if request.method == 'POST':
+        form = Job(request.POST)
+        if form.is_valid():
+            form.save()  # ✅ Save job posting to the database
+            return redirect('job_list')  # Redirect after saving
         else:
-            form = JobForm()
+            print(form.errors)  # Debugging: Print form errors
     else:
-        form = None  # Candidates don't see the form
+        form = Job()
 
-    return render(request, "job_postings.html", {"jobs": jobs, "form": form})
+    return render(request, 'job_postings.html', {'form': form})
 
 def update_settings(request):
     # Logic to update settings goes here

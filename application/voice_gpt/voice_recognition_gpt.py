@@ -1,9 +1,12 @@
 import openai
 import pyttsx3
+import os
 import speech_recognition as sr
 
 # Set your OpenAI API key
-openai.api_key = 'your_openai_api_key'
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+openai_client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Initialize Text-to-Speech Engine
 engine = pyttsx3.init()
@@ -28,14 +31,14 @@ def speech_to_text():
 
 def chat_with_gpt(prompt):
     try:
-        response = openai.ChatCompletion.create(
+        response = openai_client.chat.completions.create(
             model="gpt-4",
             messages=[{"role": "user", "content": prompt}]
         )
-        return response['choices'][0]['message']['content']
+        return response.choices[0].message.content
     except Exception as e:
         return f"Error: {str(e)}"
-    
+
 def transcribe_audio(audio_file_path):
     recognizer = sr.Recognizer()
     try:
@@ -61,4 +64,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

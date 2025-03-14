@@ -1,65 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload CV & Job Description</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 50px;
-            text-align: center;
-        }
-        form {
-            border: 1px solid #ddd;
-            padding: 20px;
-            display: inline-block;
-            background: #f9f9f9;
-            border-radius: 10px;
-        }
-        input, button {
-            margin: 10px 0;
-        }
-    </style>
-</head>
-<body>
+{% extends 'base.html' %}
 
-<h2>Upload CV & Job Description</h2>
-<form action="{% url 'upload_files' %}" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <label for="cv">Upload CV:</label>
-    <input type="file" name="cv" required>
+{% block content %}
+    <div class="container text-center mt-5">
+        <h2>Upload CV & Job Description</h2>
+        <form id="uploadForm" action="{% url 'upload_files' %}" method="post" enctype="multipart/form-data" class="border p-4 bg-light rounded d-inline-block">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="cv" class="form-label">Upload CV:</label>
+                <input type="file" name="cv" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="jd" class="form-label">Upload Job Description:</label>
+                <input type="file" name="jd" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Upload</button>
+        </form>
+        <h3 id="result" class="mt-3"></h3>
+    </div>
 
-    <label for="jd">Upload Job Description:</label>
-    <input type="file" name="jd" required>
+    <script>
+        document.getElementById("uploadForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            let formData = new FormData(this);
 
-    <button type="submit">Upload</button>
-</form>
-
-
-<h3 id="result"></h3>
-
-<script>
-    document.getElementById("uploadForm").addEventListener("submit", function(event) {
-        event.preventDefault();
-
-        let formData = new FormData(this);
-
-        fetch("/upload/", {
-            method: "POST",
-            body: formData
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.similarity) {
-                    document.getElementById("result").innerText = "Similarity Score: " + data.similarity;
-                } else if (data.error) {
-                    document.getElementById("result").innerText = "Error: " + data.error;
-                }
+            fetch("{% url 'upload_files' %}", {
+                method: "POST",
+                body: formData
             })
-            .catch(error => console.error("Error:", error));
-    });
-</script>
-
-</body>
-</html>
+                .then(response => response.json())
+                .then(data => {
+                    if (data.similarity) {
+                        document.getElementById("result").innerText = "Similarity Score: " + data.similarity;
+                    } else if (data.error) {
+                        document.getElementById("result").innerText = "Error: " + data.error;
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+        });
+    </script>
+{% endblock %}

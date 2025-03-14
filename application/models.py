@@ -64,8 +64,7 @@ class CVSubmission(models.Model):
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.name
-
+        return f"{self.candidate} - {self.submitted_at}"
 
 def validate_file(value):
     if not value.name.endswith('.pdf'):
@@ -322,6 +321,7 @@ class Job(models.Model):
 
     title = models.CharField(max_length=255)
     company_name = models.CharField(max_length=255)
+    location = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField()
     experience = models.PositiveIntegerField()
     job_type = models.CharField(max_length=10, choices=JOB_TYPE_CHOICES)

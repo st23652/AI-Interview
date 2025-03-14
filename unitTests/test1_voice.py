@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from myapp.voice_gpt.voice_recognition_gpt import transcribe_audio
+from application.voice_gpt.voice_recognition_gpt import transcribe_audio
 
 class TestVoiceRecognition(unittest.TestCase):
     @patch('speech_recognition.Recognizer.recognize_google')

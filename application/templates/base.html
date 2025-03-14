@@ -10,59 +10,64 @@
     {% endblock %}
 </head>
 <body>
-<!-- Header Section -->
-<header>
-    <div class="container">
-        <h1><a href="{% url 'home' %}">AI Interviewer</a></h1>
-        <nav>
-            <ul>
-                <li><a href="{% url 'home' %}">Home</a></li>
+<!-- Page Wrapper -->
+<div class="wrapper">
 
-                {% if user.is_authenticated %}
+    <!-- Header Section -->
+    <header>
+        <div class="container">
+            <h1><a href="{% url 'home' %}">AI Interviewer</a></h1>
+            <nav>
+                <ul>
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    {% if user.is_authenticated %}
                         <li><a href="{% url 'employer_dashboard' %}">Dashboard</a></li>
                         <li><a href="{% url 'job_postings' %}">Post Job</a></li>
-                        <li><a href="{% url 'interview' %}">Start Practice</a>
+                        <li><a href="{% url 'interview' %}">Start Practice</a></li>
                         <li><a href="{% url 'interview_create' %}">Schedule Interview</a></li>
                         <li><a href="{% url 'candidate_dashboard' %}">Dashboard</a></li>
                         <li><a href="{% url 'job_list' %}">Job Listings</a></li>
                         <li><a href="{% url 'interview_schedule' %}">Interview Status</a></li>
                         <li><a href="{% url 'skill_assessment_list' %}">Skill Assessments</a></li>
+                        <li><a href="{% url 'upload' %}">Matching CV & Job</a></li>
                         <li><a href="{% url 'profile' %}">Profile</a></li>
                         <li><a href="{% url 'logout' %}">Logout</a></li>
-                {% else %}
-                    <li><a href="{% url 'login' %}">Login</a></li>
-                    <li><a href="{% url 'register_view' %}">Register</a></li>
-                {% endif %}
-            </ul>
-        </nav>
-    </div>
-</header>
-
-<!-- Flash Messages Section -->
-{% block messages %}
-    {% if messages %}
-        <div class="messages-container">
-            {% for message in messages %}
-                <div class="alert {{ message.tags }}">{{ message }}</div>
-            {% endfor %}
+                    {% else %}
+                        <li><a href="{% url 'login' %}">Login</a></li>
+                        <li><a href="{% url 'register_view' %}">Register</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
         </div>
-    {% endif %}
-{% endblock %}
+    </header>
 
-<!-- Main Content Section -->
-<main>
-    <div class="content-container">
-        {% block content %}
-            <!-- Child templates inject content here -->
-        {% endblock %}
-    </div>
-</main>
+    <!-- Flash Messages -->
+    {% block messages %}
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                    <div class="alert {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endblock %}
 
-<!-- Footer Section -->
-<footer>
-    <div class="container">
-        <p>&copy; {% now "Y" %} AI Interviewer. All rights reserved.</p>
-    </div>
-</footer>
+    <!-- Main Content Section -->
+    <main>
+        <div class="content-container">
+            {% block content %}
+                <!-- Child templates inject content here -->
+            {% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer Section -->
+    <footer>
+        <div class="container">
+            <p>&copy; {% now "Y" %} AI Interviewer. All rights reserved.</p>
+        </div>
+    </footer>
+
+</div> <!-- End of wrapper -->
 </body>
 </html>
