@@ -1,21 +1,31 @@
+from dotenv import load_dotenv
+import os
 import openai
 import pyttsx3
-import os
 import speech_recognition as sr
 
-# Set your OpenAI API key
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# Load environment variables from .env file
+load_dotenv()
 
-openai_client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Get API key from environment variable
+api_key = os.getenv("OPENAI_API_KEY")
 
-# Initialize Text-to-Speech Engine
+if not api_key:
+    raise ValueError("Missing OpenAI API Key. Make sure it's set in the .env file.")
+
+# Initialize OpenAI client
+openai_client = openai.OpenAI(api_key=api_key)
+
+# Initialize text-to-speech engine
 engine = pyttsx3.init()
 
 def text_to_speech(text):
+    """Convert text to speech."""
     engine.say(text)
     engine.runAndWait()
 
 def speech_to_text():
+    """Convert speech to text using Google Speech Recognition."""
     recognizer = sr.Recognizer()
     with sr.Microphone() as source:
         print("Listening...")
@@ -30,6 +40,7 @@ def speech_to_text():
         return ""
 
 def chat_with_gpt(prompt):
+    """Generate a response from OpenAI GPT-4."""
     try:
         response = openai_client.chat.completions.create(
             model="gpt-4",
@@ -40,6 +51,7 @@ def chat_with_gpt(prompt):
         return f"Error: {str(e)}"
 
 def transcribe_audio(audio_file_path):
+    """Transcribe an audio file to text."""
     recognizer = sr.Recognizer()
     try:
         with sr.AudioFile(audio_file_path) as source:
@@ -50,6 +62,7 @@ def transcribe_audio(audio_file_path):
         raise ValueError(f"Error in voice recognition: {e}")
 
 def main():
+    """Main function to interact with GPT-4 using voice."""
     print("Voice GPT Chat Started. Say 'exit' to quit.")
     while True:
         user_input = speech_to_text()

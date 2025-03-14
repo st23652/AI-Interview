@@ -3,8 +3,10 @@ import sys
 import unittest
 from unittest.mock import MagicMock
 
+from cv_parser.cv_parser import is_allowed_file, save_file
+
 # Use a relative path or environment variable instead of hardcoding
-sys.path.append('C:/Users/5688s/OneDrive - University of Essex/AI-Interview')
+sys.path.append('C:/AI-Interview')
 
 
 class TestFileUploader(unittest.TestCase):
