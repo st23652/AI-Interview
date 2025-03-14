@@ -30,7 +30,7 @@ ALLOWED_HOSTS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://b09a-2001-8f8-1a61-c9ac-b966-ccbc-33cc-9bbf.ngrok-free.app'
+    "https://7a87-82-132-221-154.ngrok-free.app",
 ]
 
 # Email settings
