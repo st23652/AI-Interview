@@ -51,8 +51,6 @@
                     <p><strong>Salary:</strong> ${{ job.salary }}</p>
                     <p><strong>Deadline:</strong> {{ job.deadline|date}}"F j, Y" }}</p>
       </li>
-            {% empty %}
-                <li>No job postings available.</li>
     {% endfor %}
   </ul>
     </div>

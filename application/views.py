@@ -19,7 +19,7 @@ from . import models
 from .forms import CVForm, CandidateProfileForm, JobApplicationForm, JobForm, ProfileForm, SettingsForm, \
     InterviewScheduleForm, CustomUserCreationForm, InterviewForm, SkillAssessmentForm, UserRegistrationForm, YourForm
 from .forms import AnswerForm
-from .models import InterviewResponse, Candidate, Job
+from .models import InterviewResponse, Candidate, Job, Profile
 from django.core.serializers.json import DjangoJSONEncoder
 import json
 from .serializers import ProfileSerializer
@@ -528,20 +528,20 @@ def skill_assessment_detail(request, pk):
 @login_required
 def edit_profile(request):
     try:
-        profile = request.user.profile
+        user_profile = request.user.profile
     except models.Profile.DoesNotExist:
-        profile = models.Profile(user=request.user)
-        profile.save()
+        user_profile = models.Profile(user=request.user)
+        user_profile.save()
 
     if request.method == 'POST':
-        form = ProfileForm(request.POST, instance=profile)
+        form = ProfileForm(request.POST, instance=user_profile)
         if form.is_valid():
             form.save()
             return redirect('profile')
         else:
             print(form.errors)
     else:
-        form = ProfileForm(instance=profile)
+        form = ProfileForm(instance=user_profile)
 
     industry_choices = ProfileForm.industry_choices
 
@@ -593,12 +593,6 @@ def profile_update(request):
 
     return render(request, 'profile.html', {'form': form})
 
-
-def interview(request):
-    interviews = models.Interview.objects.all()
-    return render(request, 'interview.html', {'interviews': interviews})
-
-
 def add_interview(request):
     if request.method == 'POST':
         form = InterviewForm(request.POST)
@@ -636,7 +630,7 @@ def terms(request):
 @login_required
 def interview_list(request):
     sectors = models.Sector.objects.all()
-    return render(request, 'interview_list.html', {'sectors': sectors})
+    return render(request, 'interview_list', {'sectors': sectors})
 
 
 @login_required
@@ -756,16 +750,9 @@ def candidate_home(request):
 def employer_home(request):
     return render(request, 'employer_home.html')
 
-
 @login_required
 def profile(request):
-    profile = get_object_or_404(models.Profile, user=request.user)
-    return render(request, 'profile.html', {'profile': profile})
-
-
-class ProfileView(LoginRequiredMixin, TemplateView):
-    template_name = 'profile.html'
-
+    return render(request, 'profile.html')
 
 @login_required
 def job_create(request):
@@ -886,43 +873,40 @@ def candidate_list(request):
     candidates = models.Profile.objects.filter(is_candidate=True)
     return render(request, 'candidate_list.html', {'candidates': candidates})
 
-
-@login_required
-def edit_profile(request):
-    user = request.user
-    if request.method == 'POST':
-        form = ProfileForm(request.POST, instance=user.profile)
-        if form.is_valid():
-            form.save()
-            return redirect('profile')
-    else:
-        form = ProfileForm(instance=user.profile)
-    return render(request, 'edit_profile.html', {'form': form})
-
-
 @login_required
 def interview_schedule(request):
     # Placeholder logic for scheduling interviews
     return render(request, 'interview_schedule.html')
 
 @login_required
-def interview(request, interview_id):
-    iview = models.Interview.objects.get(id=interview_id)
-    profile = Candidate.objects.get(user=iview.candidate)
+def interview(request):
+    # Fetch the latest ongoing interview for the logged-in user
+    interview = models.Interview.objects.filter(candidate=request.user, status='ongoing').first()
+ # Redirect if no interview exists
+
+    return render(request, 'interview.html', {'interview': interview})
+
+    profile = Candidate.objects.get(user=interview.candidate)  # Fixed reference
     parsed_data = profile.cv_parsed_data
 
     # Retrieve all previous responses
-    candidate_responses = models.CandidateResponse.objects.filter(ivie=interview).order_by('id')
+    candidate_responses = models.CandidateResponse.objects.filter(interviews=interview).order_by('id')  # Fixed ivie
 
-    # Step 1: Handle POST request to capture response and generate follow-up questions
     if request.method == 'POST':
         current_question_id = request.POST.get('current_question_id')
         answer = request.POST.get('answer')
 
+        if not current_question_id:
+            return redirect('interview_page', interview_id=interview.id)
+
+        try:
+            question = models.Question.objects.get(id=current_question_id)
+        except models.Question.DoesNotExist:
+            return redirect('interview_page', interview_id=interview.id)
+
         # Save the candidate's response
-        question = models.Question.objects.get(id=current_question_id)
         response = models.CandidateResponse.objects.create(
-            ivie=interview,
+            interview=interview,
             question=question,
             answer=answer
         )
@@ -936,13 +920,11 @@ def interview(request, interview_id):
         interview.current_question_index += 1
         interview.save()
 
-        # Redirect to refresh page and show next question
         return redirect('interview_page', interview_id=interview.id)
 
-    # Step 2: Fetch the next question to ask
+    # Fetch the next question
     generic_questions = models.Question.objects.filter(question_type='generic').order_by('order')[:3]
 
-    # Step 3: After the first 3 questions, generate CV-based questions
     if interview.current_question_index < 3:
         current_question = generic_questions[interview.current_question_index]
     else:
@@ -952,21 +934,18 @@ def interview(request, interview_id):
         if question_index_in_cv_section < len(cv_based_questions):
             current_question = cv_based_questions[question_index_in_cv_section]
         else:
-            # If we have processed all CV-based questions, ask follow-up questions
             last_response = candidate_responses.last()
             if last_response and last_response.generated_follow_up:
                 current_question = last_response.generated_follow_up
             else:
-                # Mark interview as complete
                 interview.status = 'completed'
                 interview.save()
-                return redirect('interview.html')
+                return redirect('interview_complete')  # Fixed redirection
 
     return render(request, 'interview.html', {
         'current_question': current_question,
         'candidate_responses': candidate_responses
     })
-
 
 @login_required
 def job_application_list(request):

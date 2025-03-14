@@ -19,19 +19,16 @@
                 <li><a href="{% url 'home' %}">Home</a></li>
 
                 {% if user.is_authenticated %}
-                    {% if user.profile and user.profile.is_employer %}
                         <li><a href="{% url 'employer_dashboard' %}">Dashboard</a></li>
                         <li><a href="{% url 'job_postings' %}">Post Job</a></li>
-                        <li><a href="{% url 'candidates' %}">Candidates</a></li>
-                        <li><a href="{% url 'interviews' %}">Interviews</a></li>
-                    {% elif user.profile and user.profile.is_candidate %}
+                        <li><a href="{% url 'interview' %}">Start Practice</a>
+                        <li><a href="{% url 'interview_create' %}">Schedule Interview</a></li>
                         <li><a href="{% url 'candidate_dashboard' %}">Dashboard</a></li>
                         <li><a href="{% url 'job_list' %}">Job Listings</a></li>
                         <li><a href="{% url 'interview_schedule' %}">Interview Status</a></li>
                         <li><a href="{% url 'skill_assessment_list' %}">Skill Assessments</a></li>
-                    {% endif %}
-                    <li><a href="{% url 'profile' %}">Profile</a></li>
-                    <li><a href="{% url 'logout' %}">Logout</a></li>
+                        <li><a href="{% url 'profile' %}">Profile</a></li>
+                        <li><a href="{% url 'logout' %}">Logout</a></li>
                 {% else %}
                     <li><a href="{% url 'login' %}">Login</a></li>
                     <li><a href="{% url 'register_view' %}">Register</a></li>
