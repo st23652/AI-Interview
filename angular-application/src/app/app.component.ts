@@ -1,10 +1,17 @@
 import { Component } from '@angular/core';
-import { DashboardComponent } from './dashboard/dashboard.component'; // import the standalone component
+import { DashboardComponent } from './dashboard/dashboard.component';
+import {RouterOutlet} from "@angular/router"; // import the standalone component
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   standalone: true,
-  imports: [DashboardComponent], // Use the imports array for standalone components
+  imports: [
+    RouterOutlet
+  ], // Use the imports array for standalone components
 })
-export class AppComponent { }
+export class AppComponent {
+    title(title: any) {
+        throw new Error('Method not implemented.');
+    }
+}

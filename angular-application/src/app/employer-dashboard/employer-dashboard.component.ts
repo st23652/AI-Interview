@@ -4,6 +4,7 @@ import { DashboardService } from '../services/dashboard.service';
 @Component({
   selector: 'app-employer-dashboard',
   templateUrl: './employer-dashboard.component.html',
+  standalone: true,
   styleUrls: ['./employer-dashboard.component.css']
 })
 export class EmployerDashboardComponent implements OnInit {
