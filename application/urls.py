@@ -5,6 +5,7 @@ from . import views
 from .cv_parser.cv_parser import upload_files
 from .views import get_next_question, save_answers, analyze_page, analyze_cv, analyze_interview
 from rest_framework.routers import SimpleRouter
+from application.views import ai_interview, ai_feedback
 
 # Define the router and register your viewsets
 router = SimpleRouter()
@@ -12,6 +13,8 @@ router.register(r'users', views.JobViewSet)
 
 # Define your URL patterns
 urlpatterns = [
+    path("api/interview/", ai_interview, name="ai_interview"),
+    path("api/feedback/", ai_feedback, name="ai_feedback"),
     path('api/', include(router.urls)),  # Add prefix to avoid collision with other paths
     path('home/', views.home, name='home'),  # Adjusted 'home' path to prevent recursion
     path('analyze/', analyze_page, name='analyze_page'),

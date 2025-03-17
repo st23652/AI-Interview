@@ -1,0 +1,11 @@
+<div class="container">
+  <h2>AI Interview</h2>
+  <p><strong>AI:</strong> {{ aiQuestion }}</p>
+  <textarea [(ngModel)]="candidateAnswer" placeholder="Type your answer here..."></textarea>
+  <button (click)="submitAnswer()">Submit</button>
+
+  <div *ngIf="aiFeedback">
+    <h3>Feedback</h3>
+    <p>{{ aiFeedback }}</p>
+  </div>
+</div>

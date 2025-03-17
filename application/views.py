@@ -45,6 +45,35 @@ UPLOAD_FOLDER = "uploads"
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
+
+@csrf_exempt
+def ai_interview(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        job_role = data.get("job_role", "Software Engineer")
+        previous_answer = data.get("previous_answer", "")
+
+        next_question = generate_interview_question(job_role, previous_answer)
+
+        return JsonResponse({"question": next_question})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+@csrf_exempt
+def ai_feedback(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        job_role = data.get("job_role", "Software Engineer")
+        question = data.get("question", "")
+        candidate_answer = data.get("candidate_answer", "")
+
+        feedback = evaluate_answer(job_role, question, candidate_answer)
+
+        return JsonResponse({"feedback": feedback})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
 def analyze_page(request):
     return render(request, 'analyze.html')
 

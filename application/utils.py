@@ -19,6 +19,26 @@ nlp = spacy.load('en_core_web_sm')
 # Initialize text-to-speech engine
 engine = pyttsx3.init()
 
+def evaluate_answer(job_role, question, candidate_answer):
+    prompt = f"""
+    You are an AI interviewer for a {job_role} position.
+    The candidate was asked: "{question}"
+    They responded: "{candidate_answer}"
+
+    Provide detailed feedback on their response, including:
+    1. Strengths
+    2. Areas for improvement
+    3. A final rating (out of 10)
+    """
+
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[{"role": "system", "content": "You are an expert interviewer providing feedback."},
+                  {"role": "user", "content": prompt}]
+    )
+
+    return response["choices"][0]["message"]["content"]
+
 def synthesize_speech(text):
     """Convert text to speech using pyttsx3."""
     engine.say(text)
@@ -119,14 +139,20 @@ def apply_noise_cancellation():
     # Placeholder code to apply noise cancellation
     return noise_reduction
 
-def generate_interview_question(prompt):
-    openai.api_key = OPENAI_API_KEY
-    response = openai.Completion.create(
-        engine="gpt-4",
-        prompt=prompt,
-        max_tokens=150,
+def generate_interview_question(job_role, previous_answer):
+    prompt = f"""
+    You are an AI interviewer for a {job_role} position.
+    The candidate just answered: "{previous_answer}".
+    Based on this, generate the next relevant interview question.
+    """
+
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[{"role": "system", "content": "You are a professional interviewer."},
+                  {"role": "user", "content": prompt}]
     )
-    return response.choices[0].text.strip()
+
+    return response["choices"][0]["message"]["content"]
 
 # Example usage
 if __name__ == "__main__":
