@@ -1,14 +1,22 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component'; // Assuming this is a standalone component
-import { DashboardComponent } from './dashboard/dashboard.component'; // Assuming this is a standalone component
+import { AppComponent } from './app.component';
+import { QuizComponent } from './components/quiz.component';
+import { OpenaiService } from './services/openai.service';
+import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
+  declarations: [
+    AppComponent
+  ],
   imports: [
     BrowserModule,
-    AppRoutingModule,
-    // Do not declare standalone components here
-  ]
+    HttpClientModule,
+    FormsModule,
+    QuizComponent
+  ],
+  providers: [OpenaiService],
+  bootstrap: [AppComponent]
 })
 export class AppModule { }
