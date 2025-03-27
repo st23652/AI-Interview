@@ -1,0 +1,31 @@
+<div>
+  <h2>Skills Quiz</h2>
+  <label for="theme">Select Theme:</label>
+  <select id="theme" [(ngModel)]="theme">
+    <option *ngFor="let t of themes" [value]="t">{{ t }}</option>
+  </select>
+
+  <label for="numQuestions">Number of Questions:</label>
+  <input type="number" id="numQuestions" [(ngModel)]="numQuestions" min="1" max="10">
+
+  <button (click)="startQuiz()">Start Quiz</button>
+
+  <div *ngIf="questions.length">
+    <h3>Question {{ currentQuestionIndex + 1 }} of {{ questions.length }}</h3>
+    <p>{{ questions[currentQuestionIndex].question }}</p>
+    <button *ngFor="let option of questions[currentQuestionIndex].options"
+            (click)="checkAnswer(option)">
+      {{ option }}
+    </button>
+    <p *ngIf="selectedAnswer">Explanation: {{ explanation }}</p>
+    <button (click)="nextQuestion()" *ngIf="selectedAnswer">Next</button>
+  </div>
+
+  <div *ngIf="quizFinished">
+    <h3>Quiz Completed!</h3>
+    <p>Correct Answers: {{ correctAnswers }}</p>
+    <p>Wrong Answers: {{ wrongAnswers }}</p>
+    <canvas baseChart [datasets]="[{ data: [correctAnswers, wrongAnswers], label: 'Quiz Performance' }]"
+            [labels]="['Correct', 'Wrong']" [chartType]="'pie'"></canvas>
+  </div>
+</div>
