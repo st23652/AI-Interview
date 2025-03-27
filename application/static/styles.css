@@ -29,6 +29,11 @@ header {
     text-align: center;
     font-size: 22px;
     font-weight: bold;
+    overflow: hidden;
+    max-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 header a {
@@ -53,6 +58,7 @@ nav ul {
     list-style: none;
     display: flex;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 nav ul li {
@@ -184,6 +190,7 @@ input:focus, textarea:focus, select:focus {
 @media (max-width: 480px) {
     header {
         font-size: 18px;
+        padding: 10px;
     }
 
     .btn {

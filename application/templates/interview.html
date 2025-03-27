@@ -111,7 +111,7 @@
                 body: JSON.stringify({
                     question_id: question.id,
                     response: response
-                })
+                }),
             }).then(response => {
                 if (response.ok) {
                     answers[question.text] = response;
