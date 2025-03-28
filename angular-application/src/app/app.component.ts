@@ -5,7 +5,6 @@ import {RouterOutlet} from "@angular/router"; // import the standalone component
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  standalone: false,
   imports: [
     RouterOutlet
   ], // Use the imports array for standalone components

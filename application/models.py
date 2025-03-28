@@ -1,14 +1,14 @@
+# OopCompanion:suppressRename
+
 from django.contrib.auth import settings
 from django.contrib.auth.models import BaseUserManager, AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from application.managers import CustomUserManager
 import phonenumbers
 from phonenumbers import NumberParseException  # Correct import
-from phonenumbers import PhoneNumberFormat
 
 user_User = settings.AUTH_USER_MODEL
 
@@ -94,13 +94,13 @@ class CustomUser(AbstractUser):
     )
     is_staff = models.BooleanField(default=False)
     is_employer = models.BooleanField(default=False)
-    is_candidate = models.BooleanField(default=(False))
+    is_candidate = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
 
     # Add the missing fields
     company_name = models.CharField(max_length=255, blank=True, null=True)
     starting_date = models.DateField(blank=True, null=True)
-    industry = models.CharField(max_length=255, blank=True, null=(True))
+    industry = models.CharField(max_length=255, blank=True, null=True)
     occupation = models.CharField(max_length=255, blank=True, null=True)
     is_employed = models.BooleanField(default=False)
     company_size = models.CharField(max_length=50, blank=True, null=True)
@@ -165,7 +165,7 @@ class Profile(models.Model):
         super().save(*args, **kwargs)
 
 @receiver(post_save, sender=CustomUser)
-def create_user_profile(sender, instance, created, **kwargs):
+def create_user_profile(sender, instance, created):
     if created:
         Profile.objects.create(user=instance)
 
@@ -193,6 +193,33 @@ class InterviewAnswer(models.Model):
 
 def get_custom_user_form():
     from .forms import CustomUserCreationForm
+
+
+# OopCompanion:suppressRename
+
+
+# OopCompanion:suppressRename
+
+
+# OopCompanion:suppressRename
+
+
+# OopCompanion:suppressRename
+
+
+# OopCompanion:suppressRename
+
+
+# OopCompanion:suppressRename
+
+
+# OopCompanion:suppressRename
+
+
+# OopCompanion:suppressRename
+
+
+# OopCompanion:suppressRename
     return CustomUserCreationForm
 
 
@@ -253,7 +280,7 @@ class Employer(models.Model):
         ('aviation', 'Aviation'),
         ('marketing', 'Marketing'),
         ('estate', 'Real Estate'),
-        ('petrolium', 'Petrolium'),
+        ('petroleum', 'Petroleum'),
         ('agriculture', 'Agriculture'),
         ('entertainment', 'Entertainment'),
         ('hospitality', 'Hospitality'),
@@ -283,7 +310,7 @@ class Candidate(models.Model):
         ('aviation', 'Aviation'),
         ('marketing', 'Marketing'),
         ('estate', 'Real Estate'),
-        ('petrolium', 'Petrolium'),
+        ('petroleum', 'Petroleum'),
         ('agriculture', 'Agriculture'),
         ('entertainment', 'Entertainment'),
         ('hospitality', 'Hospitality'),
@@ -329,7 +356,7 @@ class Job(models.Model):
     deadline = models.DateField()
 
     class Meta:
-        db_table = 'jobpostings'
+        db_table = 'job_postings'
 
     def __str__(self):
         return f"{self.title} at {self.company_name}"

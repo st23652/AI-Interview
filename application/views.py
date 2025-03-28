@@ -6,23 +6,17 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.http import HttpResponse, JsonResponse
-from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, authenticate, logout as auth_logout
 from django.contrib import messages
-from django.views.generic import TemplateView
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.decorators.csrf import csrf_protect
 import openai
 from docx2txt import docx2txt
-
 from . import models
-from .forms import CVForm, CandidateProfileForm, JobApplicationForm, JobForm, ProfileForm, SettingsForm, \
+from .forms import CandidateProfileForm, JobApplicationForm, JobForm, ProfileForm, SettingsForm, \
     InterviewScheduleForm, CustomUserCreationForm, InterviewForm, SkillAssessmentForm, UserRegistrationForm, YourForm
 from .forms import AnswerForm
-from .models import InterviewResponse, Candidate, Job, Profile
-from django.core.serializers.json import DjangoJSONEncoder
+from .models import InterviewResponse, Candidate, Job
 import json
-from .serializers import ProfileSerializer
 from .forms import ProfilePictureForm
 from django.views.decorators.csrf import csrf_exempt
 from openai import ChatCompletion
@@ -39,6 +33,9 @@ from dotenv import load_dotenv
 from application.ai_feedback.analyzers import InternalSentimentAnalyzer
 from .forms import SentimentAnalysisForm
 from .forms import EmailAuthenticationForm  # Import the custom form
+from .utils import generate_interview_question, evaluate_answer
+
+# OopCompanion:suppressRename
 
 UPLOAD_FOLDER = "uploads"
 

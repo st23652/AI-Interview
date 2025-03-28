@@ -26,6 +26,6 @@
     <p>Correct Answers: {{ correctAnswers }}</p>
     <p>Wrong Answers: {{ wrongAnswers }}</p>
     <canvas baseChart [datasets]="[{ data: [correctAnswers, wrongAnswers], label: 'Quiz Performance' }]"
-            [labels]="['Correct', 'Wrong']" [chartType]="'pie'"></canvas>
+            [labels]="['Correct', 'Wrong']"></canvas>
   </div>
 </div>

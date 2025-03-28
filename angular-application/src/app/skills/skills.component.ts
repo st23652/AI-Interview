@@ -1,10 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { SkillsService } from './skills.service';
+import {BaseChartDirective} from "ng2-charts";
 
 @Component({
   selector: 'app-skills',
   templateUrl: './skills.component.html',
   styleUrls: ['./skills.component.css'],
+  imports: [
+    BaseChartDirective,
+    BaseChartDirective,
+    BaseChartDirective
+  ]
 })
 export class SkillsComponent implements OnInit {
   themes = ['JavaScript', 'Python', 'Django', 'Angular'];

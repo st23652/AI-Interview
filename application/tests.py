@@ -7,6 +7,9 @@ from django.utils import timezone
 from .models import CustomUser, Interview, Job
 from .views import send_interview_link
 
+
+# OopCompanion:suppressRename
+
 class EmailSendingTests(TestCase):
 
     def setUp(self):

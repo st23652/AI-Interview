@@ -11,7 +11,7 @@ export class InterviewComponent {
   jobRole = "Software Engineer";
   candidateAnswer = "";
   aiQuestion = "Welcome! Let's begin your interview.";
-  private aiFeedback: number[] | undefined;
+  protected aiFeedback: number[] | undefined;
 
   constructor(private interviewService: InterviewService) {}
 

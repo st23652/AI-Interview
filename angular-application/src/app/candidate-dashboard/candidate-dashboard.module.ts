@@ -4,11 +4,13 @@ import { CandidateDashboardComponent } from './candidate-dashboard.component';
 
 @NgModule({
   declarations: [
-    CandidateDashboardComponent
+
   ],
-  imports: [
-    CommonModule // Make sure this is imported
-  ],
+    imports: [
+        CommonModule,
+        CandidateDashboardComponent,
+        // Make sure this is imported
+    ],
   exports: [
     CandidateDashboardComponent
   ]
