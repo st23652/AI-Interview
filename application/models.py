@@ -12,6 +12,7 @@ from phonenumbers import NumberParseException  # Correct import
 
 user_User = settings.AUTH_USER_MODEL
 
+
 class Interview(models.Model):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -36,7 +37,9 @@ class Interview(models.Model):
 
     def __str__(self):
         return self.title
+
     pass
+
 
 class InterviewQuestion(models.Model):
     interview = models.ForeignKey('Interview', related_name='questions', on_delete=models.CASCADE)
@@ -65,6 +68,7 @@ class CVSubmission(models.Model):
 
     def __str__(self):
         return f"{self.candidate} - {self.submitted_at}"
+
 
 def validate_file(value):
     if not value.name.endswith('.pdf'):
@@ -117,6 +121,7 @@ class CustomUser(AbstractUser):
         # Function body here
         pass
 
+
 class Profile(models.Model):
     user = models.OneToOneField(
         CustomUser, on_delete=models.CASCADE, related_name='profile'
@@ -164,10 +169,12 @@ class Profile(models.Model):
         # your profile save logic, for example, checking if the profile has changed.
         super().save(*args, **kwargs)
 
+
 @receiver(post_save, sender=CustomUser)
-def create_user_profile(sender, instance, created):
+def create_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
+
 
 class Question(models.Model):
     QUESTION_SET_CHOICES = [
@@ -194,32 +201,23 @@ class InterviewAnswer(models.Model):
 def get_custom_user_form():
     from .forms import CustomUserCreationForm
 
+    # OopCompanion:suppressRename
 
-# OopCompanion:suppressRename
+    # OopCompanion:suppressRename
 
+    # OopCompanion:suppressRename
 
-# OopCompanion:suppressRename
+    # OopCompanion:suppressRename
 
+    # OopCompanion:suppressRename
 
-# OopCompanion:suppressRename
+    # OopCompanion:suppressRename
 
+    # OopCompanion:suppressRename
 
-# OopCompanion:suppressRename
+    # OopCompanion:suppressRename
 
-
-# OopCompanion:suppressRename
-
-
-# OopCompanion:suppressRename
-
-
-# OopCompanion:suppressRename
-
-
-# OopCompanion:suppressRename
-
-
-# OopCompanion:suppressRename
+    # OopCompanion:suppressRename
     return CustomUserCreationForm
 
 
@@ -243,6 +241,7 @@ class CustomUserManager(BaseUserManager):
             raise ValueError('Superuser must have is_superuser=True.')
 
         return self.create_user(email, username, password, **extra_fields)
+
 
 # models.py
 class Sector(models.Model):
@@ -399,6 +398,7 @@ class Application(models.Model):
     def __str__(self):
         return f"{self.candidate.user.username} - {self.job.title}"
 
+
 class SkillAssessment(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField()
@@ -406,6 +406,7 @@ class SkillAssessment(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class SkillAssessmentResult(models.Model):
     assessment = models.ForeignKey(SkillAssessment, on_delete=models.CASCADE)
