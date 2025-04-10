@@ -1,0 +1,29 @@
+.container {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.question {
+  margin-top: 20px;
+  font-size: 18px;
+}
+
+button {
+  margin: 5px;
+  padding: 10px;
+  font-size: 16px;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+button.correct {
+  background-color: green;
+}
+
+button.incorrect {
+  background-color: red;
+}

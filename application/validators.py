@@ -2,6 +2,9 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 from django.contrib.auth.password_validation import UserAttributeSimilarityValidator
 
+
+# OopCompanion:suppressRename
+
 class CustomPasswordValidator:
     def validate(self, password, user=None):
         # Minimum length check (at least 8 characters)

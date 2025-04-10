@@ -1,0 +1,12 @@
+<div *ngIf="questions.length > 0; else loading">
+  <h2>{{ questions[currentQuestionIndex]?.text }}</h2>
+  <div *ngFor="let option of questions[currentQuestionIndex]?.options">
+    <input type="radio" name="answer" [value]="option" (change)="selectedAnswer = option">
+    {{ option }}
+  </div>
+  <button (click)="submitAnswer()">Submit</button>
+</div>
+
+<ng-template #loading>
+  <p>Loading questions...</p>
+</ng-template>

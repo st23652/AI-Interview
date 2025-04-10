@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "text": "What is Angular?",
+    "options": ["JavaScript Framework", "Library", "Programming Language", "None"],
+    "answer": "JavaScript Framework"
+  },
+  {
+    "id": 2,
+    "text": "Which directive is used for loops in Angular?",
+    "options": ["*ngIf", "*ngFor", "*ngSwitch", "*ngModel"],
+    "answer": "*ngFor"
+  }
+]
