@@ -5,6 +5,8 @@ from django.conf import settings
 
 from application.ai_feedback.analyzers import InternalSentimentAnalyzer
 
+# OopCompanion:suppressRename
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
