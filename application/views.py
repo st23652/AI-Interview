@@ -841,9 +841,8 @@ def apply_job(request, pk):
 
 @login_required
 def job_list(request):
-    jobs = models.Job.objects.all()
-    return render(request, 'job_list.html', {'jobs': jobs})
-
+    jobs = Job.objects.all().values('id', 'title', 'company', 'location', 'description')
+    return JsonResponse({'jobs': list(jobs)})
 
 def candidate_create(request):
     if request.method == 'POST':
