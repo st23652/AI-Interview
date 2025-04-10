@@ -3,6 +3,9 @@ from .models import Job, CustomUser
 from django.contrib.auth.admin import UserAdmin
 from .models import CVSubmission  # Import your model
 
+
+# OopCompanion:suppressRename
+
 admin.site.register(CustomUser)
 
 @admin.register(Job)

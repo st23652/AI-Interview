@@ -1,15 +1,17 @@
 import os
 import django
 from django.conf import settings
+from django.db import connections
+from django.db.utils import OperationalError
+import unittest
 
 # Set the settings module only if it's not already set
 if not settings.configured:
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "myproject.settings")  # Replace with your actual project name
     django.setup()
 
-from django.db import connections
-from django.db.utils import OperationalError
-import unittest
+
+# OopCompanion:suppressRename
 
 class DatabaseConnectionTest(unittest.TestCase):
     def test_database_connection(self):

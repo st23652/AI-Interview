@@ -1,5 +1,8 @@
 from django.contrib.auth.models import BaseUserManager
 
+
+# OopCompanion:suppressRename
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, password=None, **extra_fields):
         if not email:

@@ -2,6 +2,9 @@ from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
+
+# OopCompanion:suppressRename
+
 UserModel = get_user_model()
 
 class EmailBackend(BaseBackend):

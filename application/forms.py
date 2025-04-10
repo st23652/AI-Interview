@@ -7,6 +7,9 @@ from .models import Interview  # Import your Interview model
 from .models import CV, InterviewResponse, CustomUser, JobApplication
 from django.contrib.auth.forms import AuthenticationForm
 
+# OopCompanion:suppressRename
+
+
 class SentimentAnalysisForm(forms.Form):
     ANALYSIS_CHOICES = [
         ("cv", "Analyze CV"),
@@ -97,6 +100,57 @@ class TakeSkillAssessmentForm(forms.ModelForm):
 
 def get_custom_user_model():
     from .models import CustomUser
+
+
+# OopCompanion:suppressRename
+
+
+# OopCompanion:suppressRename
+
+
+# OopCompanion:suppressRename
+
+
+# OopCompanion:suppressRename
+
+
+# OopCompanion:suppressRename
+
+
+# OopCompanion:suppressRename
+
+
+# OopCompanion:suppressRename
+
+
+# OopCompanion:suppressRename
+
+
+# OopCompanion:suppressRename
+
+
+# OopCompanion:suppressRename
+
+
+# OopCompanion:suppressRename
+
+
+# OopCompanion:suppressRename
+
+
+# OopCompanion:suppressRename
+
+
+# OopCompanion:suppressRename
+
+
+# OopCompanion:suppressRename
+
+
+# OopCompanion:suppressRename
+
+
+# OopCompanion:suppressRename
     return CustomUser
 
 class CustomUserCreationForm(UserCreationForm):

@@ -3,7 +3,6 @@ from unittest.mock import patch
 
 import django
 from django.test import TestCase
-
 from application.utils import generate_questions
 
 

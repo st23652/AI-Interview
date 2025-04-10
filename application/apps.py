@@ -2,6 +2,9 @@ from django.apps import AppConfig
 from django.db.models.signals import post_save
 from django.contrib.auth import get_user_model
 
+
+# OopCompanion:suppressRename
+
 # Import or define your signal handler here
 def user_saved_handler(sender, instance, created, **kwargs):
     if created:
