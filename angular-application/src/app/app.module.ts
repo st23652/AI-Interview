@@ -6,14 +6,14 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { QuizComponent } from './components/quiz/quiz.component';
 import { HomeComponent } from './pages/home/home.component';
 import { QuizPageComponent } from './pages/quiz-page/quiz-page.component';
+import { EmotionComponent } from './emotion/emotion.component';
 import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
-    AppComponent
   ],
-  imports: [BrowserModule, AppRoutingModule, HttpClientModule, QuizPageComponent, HomeComponent, QuizComponent, NavbarComponent],
+  imports: [BrowserModule, AppRoutingModule, HttpClientModule, QuizPageComponent, HomeComponent, QuizComponent, NavbarComponent, AppComponent, QuizPageComponent],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: []
 })
 export class AppModule {}
