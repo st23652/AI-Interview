@@ -21,7 +21,7 @@ class EmotionDetectionTest(TestCase):
         img_byte_arr.seek(0)
         self.test_image = InMemoryUploadedFile(img_byte_arr, None, 'test_image.png', 'image/png', sys.getsizeof(img_byte_arr), None)
 
-    @patch('myapp.views.detect_face_and_emotion')
+    @patch('application.views.detect_face_and_emotion')
     def test_process_image_emotion(self, mock_detect_face_and_emotion):
         # Mock the emotion detection function to return a predictable result
         mock_detect_face_and_emotion.return_value = {"emotion": "happy"}
@@ -33,7 +33,7 @@ class EmotionDetectionTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"emotion": "happy"})
 
-    @patch('myapp.views.detect_face_and_emotion')
+    @patch('application.views.detect_face_and_emotion')
     def test_process_image_no_face(self, mock_detect_face_and_emotion):
         # Mock the emotion detection function to return an error (no face detected)
         mock_detect_face_and_emotion.return_value = {"error": "No face detected"}

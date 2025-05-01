@@ -1,0 +1,46 @@
+// src/app/emotion/emotion.component.spec.ts
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { EmotionComponent } from './emotion.component';
+import { EmotionService } from '../emotion.service';
+import { of } from 'rxjs';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+
+class MockEmotionService {
+  detectEmotion() {
+    return of({ emotion: 'happy' });
+  }
+}
+
+describe('EmotionComponent', () => {
+  let component: EmotionComponent;
+  let fixture: ComponentFixture<EmotionComponent>;
+  let mockEmotionService: EmotionService;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [EmotionComponent],
+      providers: [{ provide: EmotionService, useClass: MockEmotionService }],
+      schemas: [NO_ERRORS_SCHEMA] // Ignore unknown elements and attributes
+    }).compileComponents();
+  });
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(EmotionComponent);
+    component = fixture.componentInstance;
+    mockEmotionService = TestBed.inject(EmotionService);
+    fixture.detectChanges();
+  });
+
+  it('should display detected emotion', () => {
+    component.emotionResult = ''; // Ensure emotionResult starts empty
+
+    // Trigger the detectEmotion method in the service
+    component.detectEmotion();
+
+    fixture.detectChanges();
+
+    // Check that the emotion is correctly displayed
+    expect(component.emotionResult).toBe('Detected Emotion: happy');
+  });
+});
