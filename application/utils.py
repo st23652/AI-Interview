@@ -7,6 +7,29 @@ import pyttsx3  # Added for text-to-speech
 from PyPDF2 import PdfReader
 from dotenv import load_dotenv
 import os
+import numpy as np
+import cv2
+from deepface import DeepFace
+
+def detect_face_and_emotion(image):
+    # Convert uploaded image to OpenCV format
+    img_array = np.fromstring(image.read(), np.uint8)
+    img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+
+    # Load pre-trained face detection model
+    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Detect faces in the image
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+
+    # If a face is detected, analyze emotion
+    if len(faces) > 0:
+        # Use DeepFace to detect emotion
+        result = DeepFace.analyze(img, actions=['emotion'])
+        return {"emotion": result[0]['dominant_emotion']}
+    else:
+        return {"error": "No face detected"}
 
 # Load environment variables from the .env file
 load_dotenv()

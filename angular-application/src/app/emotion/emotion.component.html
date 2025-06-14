@@ -1,0 +1,9 @@
+<!-- src/app/emotion/emotion.component.html -->
+
+<div class="emotion-container">
+  <h2>Live Emotion Detection</h2>
+  <video width="640" height="480" #videoElement autoplay></video>
+  <canvas width="640" height="480" style="display:none;"></canvas>
+
+  <p *ngIf="emotionResult">{{ emotionResult }}</p>
+</div>

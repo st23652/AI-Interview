@@ -13,6 +13,7 @@ router.register(r'users', views.JobViewSet)
 
 # Define your URL patterns
 urlpatterns = [
+    path('process_image/', views.process_image, name='process_image'),
     path("api/interview/", ai_interview, name="ai_interview"),
     path("api/feedback/", ai_feedback, name="ai_feedback"),
     path('api/', include(router.urls)),  # Add prefix to avoid collision with other paths

@@ -34,6 +34,18 @@ from application.ai_feedback.analyzers import InternalSentimentAnalyzer
 from .forms import SentimentAnalysisForm
 from .forms import EmailAuthenticationForm  # Import the custom form
 from .utils import generate_interview_question, evaluate_answer
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render
+from .utils import detect_face_and_emotion
+
+@csrf_exempt
+def process_image(request):
+    if request.method == 'POST' and request.FILES.get('image'):
+        image = request.FILES['image']
+        result = detect_face_and_emotion(image)
+        return JsonResponse(result)
+    return JsonResponse({"error": "No image provided"}, status=400)
 
 # OopCompanion:suppressRename
 
@@ -837,7 +849,6 @@ def apply_job(request, pk):
         'form': form,
     }
     return render(request, 'apply_job.html', context)
-
 
 @login_required
 def job_list(request):

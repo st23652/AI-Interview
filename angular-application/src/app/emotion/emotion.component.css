@@ -1,0 +1,10 @@
+/* src/app/emotion/emotion.component.css */
+
+.emotion-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+video {
+  border: 2px solid black;
+}
