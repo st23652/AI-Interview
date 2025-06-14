@@ -988,9 +988,7 @@ def job_application_list(request):
     applications = models.CVUpload.objects.filter(user=request.user)
     return render(request, 'job_application_list.html', {'applications': applications})
 
-
 @login_required
-
 def job_postings(request):
     if request.method == 'POST':
         form = Job(request.POST)
@@ -1008,11 +1006,9 @@ def update_settings(request):
     # Logic to update settings goes here
     return HttpResponse("Settings updated successfully!")
 
-
 @login_required
 def profile_update(request):
     return edit_profile(request)
-
 
 def reset_password(request):
     if request.method == 'POST':
@@ -1023,8 +1019,16 @@ def reset_password(request):
             return redirect('home')
     return render(request, 'reset_password.html')
 
-
 def contact(request):
     if request.method == 'POST':
         # Handle form submission
         return HttpResponse("Contact form submitted successfully!")
+
+def get_interview_questions(request, interview_id):
+    # Dummy placeholder — replace with DB logic later
+    questions = [
+        "What is your greatest achievement?",
+        "Tell me about a difficult decision you had to make.",
+        "How do you handle pressure?"
+    ]
+    return JsonResponse({'questions': questions})
