@@ -850,7 +850,6 @@ def apply_job(request, pk):
     }
     return render(request, 'apply_job.html', context)
 
-
 @login_required
 def job_list(request):
     jobs = Job.objects.all().values('id', 'title', 'company', 'location', 'description')
