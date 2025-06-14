@@ -1,214 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Auto Interview</title>
+    <meta charset="UTF-8">
+    <title>AI Interview</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; max-width: 700px; margin: auto; }
-        #videoPreview { width: 100%; max-width: 600px; border: 1px solid #ccc; }
-        #question { margin: 20px 0; font-size: 1.2em; }
-        button { margin: 10px 5px 20px 0; padding: 10px 20px; font-size: 1em; }
-        #summary { margin-top: 40px; }
-        #summary ul { list-style: none; padding: 0; }
-        #summary li { margin-bottom: 10px; }
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; }
+        #video-container { border: 2px solid #ccc; margin-bottom: 20px; }
+        #question-container { width: 640px; min-height: 50px; border: 1px solid #eee; padding: 15px; text-align: center; font-size: 1.2em; margin-bottom: 20px;}
+        #controls button { font-size: 1em; padding: 10px 20px; cursor: pointer; }
+        #status { margin-top: 15px; font-style: italic; color: #555; }
     </style>
 </head>
 <body>
+    <h1>AI Interview</h1>
 
-    <h1>Auto Interview</h1>
+    <div id="video-container">
+        <video id="webcam" width="640" height="480" autoplay playsinline muted></video>
+        </div>
 
-    <video id="videoPreview" autoplay muted></video>
-
-    <div id="question"></div>
-
-    <button id="startBtn">Start Recording</button>
-    <button id="stopBtn" disabled>Stop Recording</button>
-
-    <div id="summary" style="display:none;">
-        <h2>Interview Summary</h2>
-        <ul id="summaryList"></ul>
+    <div id="question-container">
+        <p id="question-text">Click "Start Interview" to begin.</p>
     </div>
 
-    <script>
-        // Interview questions - you can replace these with Django template vars or API data
-        const questions = [
-            "Tell me about yourself.",
-            "Why do you want this job?",
-            "Describe a challenging situation you faced."
-        ];
+    <div id="controls">
+        <button id="start-interview-btn">Start Interview</button>
+        <button id="next-question-btn" disabled>Next Question</button>
+        <button id="start-record-btn" disabled>Start Recording</button>
+        <button id="stop-record-btn" disabled>Stop Recording</button>
+    </div>
 
-        let currentQuestionIndex = 0;
+    <p id="status">Ready.</p>
+    <p>Emotion: <span id="emotion"></span></p>
+
+    <script>
+        const questions = [
+            "Tell me about a time you faced a difficult challenge at work.",
+            "What are your biggest strengths?",
+            "Why are you interested in this position?",
+            "Where do you see yourself in five years?"
+        ];
+        let currentQuestionIndex = -1;
         let mediaRecorder;
         let recordedChunks = [];
-        let stream;
-        let summary = [];
 
-        const videoPreview = document.getElementById('videoPreview');
-        const questionDiv = document.getElementById('question');
-        const startBtn = document.getElementById('startBtn');
-        const stopBtn = document.getElementById('stopBtn');
-        const summaryDiv = document.getElementById('summary');
-        const summaryList = document.getElementById('summaryList');
+        // HTML Elements
+        const videoElement = document.getElementById('webcam');
+        const questionTextElement = document.getElementById('question-text');
+        const startInterviewBtn = document.getElementById('start-interview-btn');
+        const nextQuestionBtn = document.getElementById('next-question-btn');
+        const startRecordBtn = document.getElementById('start-record-btn');
+        const stopRecordBtn = document.getElementById('stop-record-btn');
+        const statusElement = document.getElementById('status');
 
-        // Display current question
-        function showQuestion(index) {
-            questionDiv.textContent = `Question ${index + 1}: ${questions[index]}`;
-        }
+        // Event Listeners
+        startInterviewBtn.addEventListener('click', startInterview);
+        nextQuestionBtn.addEventListener('click', displayNextQuestion);
+        startRecordBtn.addEventListener('click', startRecording);
+        stopRecordBtn.addEventListener('click', stopRecording);
 
-        // Initialize webcam stream
-        async function initWebcam() {
+
+        async function startInterview() {
+            statusElement.textContent = "Initializing webcam...";
             try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                videoPreview.srcObject = stream;
-            } catch (err) {
-                alert("Could not access webcam and microphone. Please allow access.");
-                console.error(err);
-            }
-        }
-
-        // Helper to get CSRF token from cookies (for Django POST)
-        function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-        }
-
-        // Upload recorded video blob to backend
-        async function uploadVideo(blob, questionIndex) {
-            const formData = new FormData();
-            formData.append('video', blob, `answer_q${questionIndex + 1}.webm`);
-            formData.append('question_index', questionIndex);
-            // Add interview id if available, example:
-            // formData.append('interview_id', {{ interview.id }});
-
-            try {
-                const res = await fetch('/upload-answer/', {
-                    method: 'POST',
-                    headers: { 'X-CSRFToken': getCookie('csrftoken') },
-                    body: formData
-                });
-                if (!res.ok) {
-                    console.error('Video upload failed', await res.text());
-                }
-                return res.json();
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                videoElement.srcObject = stream;
+                startInterviewBtn.disabled = true;
+                nextQuestionBtn.disabled = false;
+                statusElement.textContent = "Webcam activated. Click 'Next Question' to begin.";
             } catch (error) {
-                console.error('Upload error:', error);
+                console.error("Error accessing webcam:", error);
+                statusElement.textContent = "Error: Could not access webcam. Please check permissions.";
+                alert("Could not access your webcam. Please ensure you have a webcam connected and have granted permission.");
             }
         }
 
-        // Send video for emotion detection (base64 encoded)
-        async function analyzeEmotion(blob) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onloadend = async () => {
-                    const base64data = reader.result.split(',')[1]; // Remove prefix
-                    try {
-                        const res = await fetch('/analyze-emotion/', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRFToken': getCookie('csrftoken')
-                            },
-                            body: JSON.stringify({ video: base64data })
-                        });
-                        if (!res.ok) {
-                            reject('Emotion analysis failed');
-                        } else {
-                            const data = await res.json();
-                            resolve(data.emotions);
-                        }
-                    } catch (e) {
-                        reject(e);
-                    }
-                };
-                reader.readAsDataURL(blob);
-            });
+        function displayNextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                questionTextElement.textContent = questions[currentQuestionIndex];
+                startRecordBtn.disabled = false;
+                nextQuestionBtn.disabled = true;
+                statusElement.textContent = `Displaying question ${currentQuestionIndex + 1} of ${questions.length}.`;
+            } else {
+                questionTextElement.textContent = "Thank you! You have completed the interview.";
+                statusElement.textContent = "Interview Finished.";
+                startRecordBtn.disabled = true;
+                stopRecordBtn.disabled = true;
+                nextQuestionBtn.disabled = true;
+            }
         }
 
-        // Show summary UI
-        function showSummary() {
-            startBtn.style.display = 'none';
-            stopBtn.style.display = 'none';
-            questionDiv.style.display = 'none';
-            videoPreview.style.display = 'none';
-
-            summaryDiv.style.display = 'block';
-            summaryList.innerHTML = '';
-
-            summary.forEach((item, idx) => {
-                const li = document.createElement('li');
-                li.innerHTML = `<strong>Question ${idx + 1}:</strong> ${questions[idx]}<br/>
-                                <strong>Detected emotions:</strong> ${JSON.stringify(item.emotions)}`;
-                summaryList.appendChild(li);
-            });
-        }
-
-        // Start recording handler
-        startBtn.onclick = () => {
+        function startRecording() {
             recordedChunks = [];
+            const stream = videoElement.srcObject;
             mediaRecorder = new MediaRecorder(stream);
 
-            mediaRecorder.ondataavailable = event => {
+            mediaRecorder.ondataavailable = (event) => {
                 if (event.data.size > 0) {
                     recordedChunks.push(event.data);
                 }
             };
 
-            mediaRecorder.onstop = async () => {
+            mediaRecorder.onstop = () => {
                 const blob = new Blob(recordedChunks, { type: 'video/webm' });
-                // Upload video to backend
-                await uploadVideo(blob, currentQuestionIndex);
+                const url = URL.createObjectURL(blob);
 
-                // Analyze emotions
-                let emotions = {};
-                try {
-                    emotions = await analyzeEmotion(blob);
-                } catch (e) {
-                    console.error('Emotion analysis error:', e);
-                }
+                // For now, we'll just download the file.
+                // In the future, you would send this 'blob' to your Django backend.
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = `answer_question_${currentQuestionIndex + 1}.webm`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
 
-                // Save summary data
-                summary.push({ questionIndex: currentQuestionIndex, emotions });
-
-                // Move to next question or finish
-                currentQuestionIndex++;
-                if (currentQuestionIndex < questions.length) {
-                    showQuestion(currentQuestionIndex);
-                    startBtn.disabled = false;
-                    stopBtn.disabled = true;
-                } else {
-                    showSummary();
-                }
+                statusElement.textContent = `Answer for question ${currentQuestionIndex + 1} saved.`;
+                nextQuestionBtn.disabled = false; // Allow moving to the next question
             };
 
             mediaRecorder.start();
-            startBtn.disabled = true;
-            stopBtn.disabled = false;
-        };
+            statusElement.textContent = "Recording...";
+            startRecordBtn.disabled = true;
+            stopRecordBtn.disabled = false;
+        }
 
-        // Stop recording handler
-        stopBtn.onclick = () => {
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
-                mediaRecorder.stop();
-                startBtn.disabled = true;
-                stopBtn.disabled = true;
-            }
-        };
+        function stopRecording() {
+            mediaRecorder.stop();
+            statusElement.textContent = "Processing and saving your answer...";
+            startRecordBtn.disabled = true;
+            stopRecordBtn.disabled = true;
+        }
 
-        // Init
-        window.onload = async () => {
-            await initWebcam();
-            showQuestion(currentQuestionIndex);
-            startBtn.disabled = false;
-            stopBtn.disabled = true;
-        };
     </script>
-
 </body>
 </html>
-<script>
-        // Ensure the browser supports MediaRecorder
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            alert("Your browser does not support video recording. Please use a modern browser.");
-        }
-</script>   
