@@ -404,7 +404,7 @@ def send_interview_link(interview_id, recruiter_email):
         interview_link = f"http://127.0.0.1:8000/interviews/{interview_id}/"
 
         subject = "Candidate Interview Link"
-        message = render_to_string('interview_link_email.html', {
+        message = render_to_string('C:/AI-Interview/application/templates/email_templates/interview_link_email.html', {
             'interview_link': interview_link,
             'recruiter_name': 'Recruiter',
         })

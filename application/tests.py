@@ -50,7 +50,6 @@ class EmailSendingTests(TestCase):
             answers={},
             feedback='',
             completed=False,
-            job=self.job
         )
 
         # Set recruiter email for the test
@@ -94,7 +93,7 @@ class EmailTemplateTests(TestCase):
         }
         
         # Render the email body using the template
-        email_body = render_to_string('interview_link_email.html', context)
+        email_body = render_to_string('C:/AI-Interview/application/templates/email_templates/interview_link_email.html', context)
         
         # Check if the email body contains the link and proper content
         self.assertIn(interview_link, email_body)
