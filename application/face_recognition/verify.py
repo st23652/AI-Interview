@@ -1,2 +1,8 @@
 import face_recognition
-print("Everything works!")
+import logging
+
+def verify_system():
+	logging.basicConfig(level=logging.INFO)
+	logging.info("System verification successful.")
+
+verify_system()
