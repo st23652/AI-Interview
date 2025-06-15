@@ -1,68 +1,137 @@
-{% extends "base.html" %}
-{% block content %}
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Auto Interview Page</title>
+    <meta charset="UTF-8">
+    <title>AI Interview</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; }
+        #video-container { border: 2px solid #ccc; margin-bottom: 20px; }
+        #question-container { width: 640px; min-height: 50px; border: 1px solid #eee; padding: 15px; text-align: center; font-size: 1.2em; margin-bottom: 20px;}
+        #controls button { font-size: 1em; padding: 10px 20px; cursor: pointer; }
+        #status { margin-top: 15px; font-style: italic; color: #555; }
+    </style>
 </head>
 <body>
-    <div id="interview-session">
-        <div id="question-container">
-            <p id="question-text"></p>
-        </div>
-        <div id="response-container">
-            <label for="response">Your Response:</label>
-            <textarea id="response" rows="4" cols="50"></textarea>
-        </div>
-        <div id="control-buttons">
-            <button id="submit-response" onclick="submitResponse()">Submit Response</button>
-            <button id="next-question" style="display: none;" onclick="nextQuestion()">Next Question</button>
-        </div>
+    <h1>AI Interview</h1>
+
+    <div id="video-container">
+        self.assertIn('id="webcam"', content)
     </div>
 
+    <div id="question-container">
+        <p id="question-text">Click "Start Interview" to begin.</p>
+    </div>
+
+    <div id="controls">
+        <button id="start-interview-btn">Start Interview</button>
+        <button id="next-question-btn" disabled>Next Question</button>
+        <button id="start-record-btn" disabled>Start Recording</button>
+        <button id="stop-record-btn" disabled>Stop Recording</button>
+    </div>
+
+    <p id="status">Ready.</p>
+    <p>Emotion: <span id="emotion"></span></p>
+
     <script>
-        let interviewId = "{{ interview.id }}"; // Set this from Django context
-        let answers = {};
-        let currentQuestionIndex = 0;
+        const questions = [
+            "Tell me about a time you faced a difficult challenge at work.",
+            "What are your biggest strengths?",
+            "Why are you interested in this position?",
+            "Where do you see yourself in five years?"
+        ];
+        let currentQuestionIndex = -1;
+        let mediaRecorder;
+        let recordedChunks = [];
 
-        function fetchNextQuestion() {
-            fetch(`/interviews/${interviewId}/next_question/?answers=${encodeURIComponent(JSON.stringify(answers))}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        console.error(data.error);
-                        return;
-                    }
-                    document.getElementById('question-text').innerText = data.question;
-                    document.getElementById('next-question').style.display = 'none';
-                    document.getElementById('submit-response').style.display = 'inline';
-                }).catch(error => {
-                    console.error('Error fetching next question:', error);
-                });
-        }
+        // HTML Elements
+        const videoElement = document.getElementById('webcam');
+        const questionTextElement = document.getElementById('question-text');
+        const startInterviewBtn = document.getElementById('start-interview-btn');
+        const nextQuestionBtn = document.getElementById('next-question-btn');
+        const startRecordBtn = document.getElementById('start-record-btn');
+        const stopRecordBtn = document.getElementById('stop-record-btn');
+        const statusElement = document.getElementById('status');
 
-        function submitResponse() {
-            const response = document.getElementById('response').value.trim();
-            if (response === "") {
-                alert("Please provide a response.");
-                return;
+        // Event Listeners
+        startInterviewBtn.addEventListener('click', startInterview);
+        nextQuestionBtn.addEventListener('click', displayNextQuestion);
+        startRecordBtn.addEventListener('click', startRecording);
+        stopRecordBtn.addEventListener('click', stopRecording);
+
+
+        async function startInterview() {
+            statusElement.textContent = "Initializing webcam...";
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                videoElement.srcObject = stream;
+                startInterviewBtn.disabled = true;
+                nextQuestionBtn.disabled = false;
+                statusElement.textContent = "Webcam activated. Click 'Next Question' to begin.";
+            } catch (error) {
+                console.error("Error accessing webcam:", error);
+                statusElement.textContent = "Error: Could not access webcam. Please check permissions.";
+                alert("Could not access your webcam. Please ensure you have a webcam connected and have granted permission.");
             }
-            
-            answers[currentQuestionIndex] = response;
-            document.getElementById('response').value = "";
+        }
 
+        function displayNextQuestion() {
             currentQuestionIndex++;
-            document.getElementById('submit-response').style.display = 'none';
-            document.getElementById('next-question').style.display = 'inline';
-            
-            fetchNextQuestion();
+            if (currentQuestionIndex < questions.length) {
+                questionTextElement.textContent = questions[currentQuestionIndex];
+                startRecordBtn.disabled = false;
+                nextQuestionBtn.disabled = true;
+                statusElement.textContent = `Displaying question ${currentQuestionIndex + 1} of ${questions.length}.`;
+            } else {
+                questionTextElement.textContent = "Thank you! You have completed the interview.";
+                statusElement.textContent = "Interview Finished.";
+                startRecordBtn.disabled = true;
+                stopRecordBtn.disabled = true;
+                nextQuestionBtn.disabled = true;
+            }
         }
 
-        function nextQuestion() {
-            fetchNextQuestion();
+        function startRecording() {
+            recordedChunks = [];
+            const stream = videoElement.srcObject;
+            mediaRecorder = new MediaRecorder(stream);
+
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    recordedChunks.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+
+                // For now, we'll just download the file.
+                // In the future, you would send this 'blob' to your Django backend.
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = `answer_question_${currentQuestionIndex + 1}.webm`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+
+                statusElement.textContent = `Answer for question ${currentQuestionIndex + 1} saved.`;
+                nextQuestionBtn.disabled = false; // Allow moving to the next question
+            };
+
+            mediaRecorder.start();
+            statusElement.textContent = "Recording...";
+            startRecordBtn.disabled = true;
+            stopRecordBtn.disabled = false;
         }
 
-        // Initial call to start the interview
-        fetchNextQuestion();
+        function stopRecording() {
+            mediaRecorder.stop();
+            statusElement.textContent = "Processing and saving your answer...";
+            startRecordBtn.disabled = true;
+            stopRecordBtn.disabled = true;
+        }
+
     </script>
 </body>
-
-{% endblock %}
+</html>

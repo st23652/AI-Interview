@@ -365,10 +365,8 @@ def upload_resume(request):
         form = CVUploadForm()
     return render(request, 'upload_resume.html', {'form': form})
 
-
 def auto_interview(request):
     return render(request, 'auto_interview.html')
-
 
 interview_link = "http://127.0.0.1:8000/interviews/1/"
 message = render_to_string('email_templates/interview_link_email.html', {
@@ -376,7 +374,6 @@ message = render_to_string('email_templates/interview_link_email.html', {
     'recruiter_name': 'Recruiter',
 })
 print(message)
-
 
 def create_interview(request):
     # Code to create an interview instance
@@ -404,7 +401,7 @@ def send_interview_link(interview_id, recruiter_email):
         interview_link = f"http://127.0.0.1:8000/interviews/{interview_id}/"
 
         subject = "Candidate Interview Link"
-        message = render_to_string('interview_link_email.html', {
+        message = render_to_string('C:/AI-Interview/application/templates/email_templates/interview_link_email.html', {
             'interview_link': interview_link,
             'recruiter_name': 'Recruiter',
         })
@@ -988,9 +985,7 @@ def job_application_list(request):
     applications = models.CVUpload.objects.filter(user=request.user)
     return render(request, 'job_application_list.html', {'applications': applications})
 
-
 @login_required
-
 def job_postings(request):
     if request.method == 'POST':
         form = Job(request.POST)
@@ -1008,11 +1003,9 @@ def update_settings(request):
     # Logic to update settings goes here
     return HttpResponse("Settings updated successfully!")
 
-
 @login_required
 def profile_update(request):
     return edit_profile(request)
-
 
 def reset_password(request):
     if request.method == 'POST':
@@ -1023,8 +1016,16 @@ def reset_password(request):
             return redirect('home')
     return render(request, 'reset_password.html')
 
-
 def contact(request):
     if request.method == 'POST':
         # Handle form submission
         return HttpResponse("Contact form submitted successfully!")
+
+def get_interview_questions(request, interview_id):
+    # Dummy placeholder — replace with DB logic later
+    questions = [
+        "What is your greatest achievement?",
+        "Tell me about a difficult decision you had to make.",
+        "How do you handle pressure?"
+    ]
+    return JsonResponse({'questions': questions})
