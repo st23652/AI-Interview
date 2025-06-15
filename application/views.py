@@ -365,10 +365,8 @@ def upload_resume(request):
         form = CVUploadForm()
     return render(request, 'upload_resume.html', {'form': form})
 
-
 def auto_interview(request):
     return render(request, 'auto_interview.html')
-
 
 interview_link = "http://127.0.0.1:8000/interviews/1/"
 message = render_to_string('email_templates/interview_link_email.html', {
@@ -376,7 +374,6 @@ message = render_to_string('email_templates/interview_link_email.html', {
     'recruiter_name': 'Recruiter',
 })
 print(message)
-
 
 def create_interview(request):
     # Code to create an interview instance
