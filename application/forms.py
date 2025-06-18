@@ -1,14 +1,18 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from .models import Profile, Job, Application, Interview, SkillAssessment, Skill, SkillAssessmentResult
-from .models import CVUpload
-from .models import Candidate, Employer
-from .models import Interview  # Import your Interview model
-from .models import CV, InterviewResponse, CustomUser, JobApplication
-from django.contrib.auth.forms import AuthenticationForm
-
-# OopCompanion:suppressRename
-
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from .models import (
+    Profile,
+    Job,
+    JobApplication,  # Replaces Application
+    Interview,
+    InterviewQuestion,
+    InterviewResponse,  # Replaces InterviewAnswer
+    SkillAssessment,
+    AssessmentQuestion,
+    AssessmentResult,  # Replaces SkillAssessmentResult
+    CustomUser
+)
+from django.core.exceptions import ValidationError
 
 class SentimentAnalysisForm(forms.Form):
     ANALYSIS_CHOICES = [
@@ -17,7 +21,8 @@ class SentimentAnalysisForm(forms.Form):
     ]
 
     analysis_type = forms.ChoiceField(choices=ANALYSIS_CHOICES, widget=forms.RadioSelect, required=True)
-    interview_question = forms.CharField(max_length=500, required=False, widget=forms.TextInput(attrs={'placeholder': 'Enter Interview Question'}))
+    interview_question = forms.CharField(max_length=500, required=False, 
+                                       widget=forms.TextInput(attrs={'placeholder': 'Enter Interview Question'}))
     interview_answer = forms.CharField(widget=forms.Textarea(attrs={'placeholder': 'Enter Your Answer'}), required=False)
     resume = forms.FileField(required=False)
 
@@ -27,131 +32,79 @@ class EmailAuthenticationForm(AuthenticationForm):
 class InterviewFeedbackForm(forms.ModelForm):
     class Meta:
         model = Interview
-        abstract = True
-        fields = ['feedback']  # Assuming `feedback` is a field in the Interview model
+        fields = ['feedback']
         widgets = {
             'feedback': forms.Textarea(attrs={'rows': 4, 'cols': 40}),
         }
 
-class CVUploadForm(forms.ModelForm):
-    class Meta:
-        model = CV
-        fields = ['file']
-
 class AnswerForm(forms.ModelForm):
     class Meta:
         model = InterviewResponse
-        fields = ['response_text', 'interview', 'question']
+        fields = ['answer', 'interview', 'question']  # Using 'answer' instead of 'response_text'
+
+from django import forms
+from .models import Interview, InterviewResponse
 
 class InterviewForm(forms.ModelForm):
     class Meta:
         model = Interview
-        fields = ['title', 'description', 'scheduled_date']
+        fields = [
+            'title', 
+            'description', 
+            'candidate',  # ForeignKey to CustomUser
+            'interviewer',  # ForeignKey to CustomUser
+            'job',  # ForeignKey to Job (optional)
+            'scheduled_time',  # DateTimeField
+            'duration',  # PositiveIntegerField
+            'question_set',  # CharField with choices
+            'status'  # CharField with choices
+        ]
+        widgets = {
+            'scheduled_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'duration': forms.NumberInput(attrs={'min': 15, 'max': 120}),
+            'description': forms.Textarea(attrs={'rows': 3}),
+        }
+
+class InterviewResponseForm(forms.ModelForm):
+    class Meta:
+        model = InterviewResponse
+        fields = [
+            'interview',  # ForeignKey to Interview
+            'question',  # ForeignKey to InterviewQuestion
+            'answer',  # TextField
+            'score'  # PositiveIntegerField (optional)
+        ]
+        widgets = {
+            'answer': forms.Textarea(attrs={'rows': 4, 'cols': 40}),
+            'score': forms.NumberInput(attrs={'min': 0, 'max': 100}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Example of customizing querysets if needed
+        if 'interview' in self.initial:
+            self.fields['question'].queryset = InterviewQuestion.objects.filter(
+                question_set=self.initial['interview'].question_set
+            )
 
 class InterviewScheduleForm(forms.Form):
     interview_date = forms.DateField(widget=forms.SelectDateWidget)
     interview_time = forms.TimeField(widget=forms.TimeInput(format='%H:%M'))
 
-class YourForm(forms.Form):
-    name = forms.CharField(max_length=100)
-    email = forms.EmailField()
-
-class CandidateForm(forms.ModelForm):
-    class Meta:
-        model = Candidate
-        fields = ['occupation', 'date_of_birth', 'industry', 'currently_employed', 'current_company']
-        widgets = {
-            'industry': forms.Select(choices=Candidate.INDUSTRY_CHOICES),
-        }
-
-class EmployerForm(forms.ModelForm):
-    class Meta:
-        model = Employer
-        fields = ['company_name', 'start_date', 'company_size', 'industry']
-        widgets = {
-            'company_size': forms.Select(choices=Employer.COMPANY_SIZE_CHOICES),
-            'industry': forms.Select(choices=Employer.INDUSTRY_CHOICES),
-        }
-        
 class SettingsForm(forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = ['username', 'email', 'phone', 'bio', 'linkedin', 'github']
 
-class CVUploadForm(forms.ModelForm):
-    class Meta:
-        model = CVUpload
-        fields = ['resume']
-
 class SkillForm(forms.ModelForm):
     class Meta:
-        model = Skill
-        fields = ['name', 'description']
-
-class SkillAssessmentForm(forms.ModelForm):
-    class Meta:
         model = SkillAssessment
-        fields = ['name', 'description', 'questions']
+        fields = ['name', 'description', 'passing_score']
 
 class TakeSkillAssessmentForm(forms.ModelForm):
     class Meta:
-        model = SkillAssessmentResult
+        model = AssessmentResult
         fields = ['answers']
-
-def get_custom_user_model():
-    from .models import CustomUser
-
-
-# OopCompanion:suppressRename
-
-
-# OopCompanion:suppressRename
-
-
-# OopCompanion:suppressRename
-
-
-# OopCompanion:suppressRename
-
-
-# OopCompanion:suppressRename
-
-
-# OopCompanion:suppressRename
-
-
-# OopCompanion:suppressRename
-
-
-# OopCompanion:suppressRename
-
-
-# OopCompanion:suppressRename
-
-
-# OopCompanion:suppressRename
-
-
-# OopCompanion:suppressRename
-
-
-# OopCompanion:suppressRename
-
-
-# OopCompanion:suppressRename
-
-
-# OopCompanion:suppressRename
-
-
-# OopCompanion:suppressRename
-
-
-# OopCompanion:suppressRename
-
-
-# OopCompanion:suppressRename
-    return CustomUser
 
 class CustomUserCreationForm(UserCreationForm):
     name = forms.CharField(max_length=100, required=True)
@@ -167,18 +120,7 @@ class CustomUserCreationForm(UserCreationForm):
 
     class Meta:
         model = CustomUser
-        fields = ['username', 'email', 'phone', 'bio', 'linkedin', 'github', 'user_type', 'password']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['password'].widget = forms.PasswordInput()
-
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        if commit:
-            user.set_password(self.cleaned_data['password'])
-            user.save()
-        return user
+        fields = ['username', 'email', 'phone', 'bio', 'linkedin', 'github', 'user_type', 'password1', 'password2']
 
 class UserLoginForm(forms.Form):
     email = forms.EmailField()
@@ -188,41 +130,27 @@ class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = [
-            'is_candidate', 'is_employer', 
-            'occupation', 'date_of_birth', 'industry', 
-            'currently_employed', 'current_company', 
-            'company_name', 'company_start_date', 'company_size', 'company_industry'
+            'profile_picture', 'occupation', 'date_of_birth', 'industry',
+            'currently_employed', 'current_company', 'company_name',
+            'company_start_date', 'company_size', 'company_industry'
         ]
 
 class JobApplicationForm(forms.ModelForm):
-    # These fields won't be in the database but will display the user's information
     candidate_name = forms.CharField(max_length=255, required=False, disabled=True)
     candidate_email = forms.EmailField(required=False, disabled=True)
 
     class Meta:
         model = JobApplication
-        fields = ['job', 'resume', 'cover_letter']  # Do not include candidate_name and candidate_email here
+        fields = ['job', 'resume', 'cover_letter']
         widgets = {
             'cover_letter': forms.Textarea(attrs={'rows': 4}),
         }
 
     def __init__(self, *args, **kwargs):
-        # Initialize the form and set the candidate_name and candidate_email based on the applicant
         super().__init__(*args, **kwargs)
-
-        if self.instance and self.instance.applicant:
-            self.fields['candidate_name'].initial = self.instance.applicant.username
-            self.fields['candidate_email'].initial = self.instance.applicant.email
-
-class ApplicationForm(forms.ModelForm):
-    job = forms.ModelChoiceField(queryset=Job.objects.all(), empty_label="Select a job", widget=forms.Select)
-    
-    class Meta:
-        model = Application
-        fields = ['job', 'resume', 'cover_letter']
-        widgets = {
-            'cover_letter': forms.Textarea(attrs={'rows': 4}),
-        }
+        if self.instance and self.instance.candidate:
+            self.fields['candidate_name'].initial = self.instance.candidate.username
+            self.fields['candidate_email'].initial = self.instance.candidate.email
 
 class UserRegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
@@ -233,7 +161,7 @@ class UserRegistrationForm(forms.ModelForm):
     company_name = forms.CharField(required=False)
     employer_industry = forms.CharField(required=False)
     starting_date = forms.DateField(required=False)
-    company_size = forms.ChoiceField(choices=Employer.COMPANY_SIZE_CHOICES, required=False)
+    company_size = forms.CharField(required=False)
     phone = forms.CharField(required=True)
     profile_picture = forms.ImageField(required=False)
 
@@ -268,7 +196,6 @@ class UserRegistrationForm(forms.ModelForm):
         user.set_password(self.cleaned_data["password"])
         if commit:
             user.save()
-            # Assuming Profile creation is part of the registration process
             Profile.objects.create(
                 user=user,
                 occupation=self.cleaned_data.get('occupation'),
@@ -281,26 +208,12 @@ class UserRegistrationForm(forms.ModelForm):
         return user
 
 class ProfileForm(forms.ModelForm):
-    # Define the industry choices
-    industry_choices = [
-        'Technology',
-        'Finance',
-        'Healthcare',
-        'Education',
-        'Manufacturing',
-        'Retail',
-        'Hospitality',
-        'Other'
-    ]
-
-    # Define the fields in the form
-    industry = forms.ChoiceField(choices=[(i, i) for i in industry_choices], required=False)
-
     class Meta:
         model = Profile
-        fields = ['occupation', 'profile_picture', 'date_of_birth', 'industry', 'currently_employed', 'current_company',
-                  'company_name', 'company_start_date', 'company_size', 'company_industry']
-        
+        fields = ['profile_picture', 'occupation', 'date_of_birth', 'industry', 
+                 'currently_employed', 'current_company', 'company_name',
+                 'company_start_date', 'company_size', 'company_industry']
+
 class ProfilePictureForm(forms.ModelForm):
     class Meta:
         model = Profile
@@ -309,20 +222,16 @@ class ProfilePictureForm(forms.ModelForm):
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
     phone = forms.CharField(required=True)
-    country_code = forms.ChoiceField(choices=[('+1', 'US'), ('+44', 'UK')])  # Example choices
     user_type = forms.ChoiceField(choices=[('candidate', 'Candidate'), ('employer', 'Employer')])
     occupation = forms.CharField(required=False)
     candidate_industry = forms.CharField(required=False)
-    experience = forms.IntegerField(required=False)
-    resume = forms.FileField(required=False)
-    company = forms.CharField(required=False)
+    company_name = forms.CharField(required=False)
     employer_industry = forms.CharField(required=False)
-    years_open = forms.IntegerField(required=False)
-    photo = forms.ImageField(required=True)
+    photo = forms.ImageField(required=False)
 
     class Meta:
         model = CustomUser
-        fields = ['username', 'email', 'password1', 'password2']
+        fields = ['username', 'email', 'password1', 'password2', 'phone', 'user_type']
 
     def clean(self):
         cleaned_data = super().clean()
@@ -334,7 +243,7 @@ class RegisterForm(UserCreationForm):
             if not cleaned_data.get('candidate_industry'):
                 raise forms.ValidationError('Please enter your industry.')
         elif user_type == 'employer':
-            if not cleaned_data.get('company'):
+            if not cleaned_data.get('company_name'):
                 raise forms.ValidationError('Please enter your company name.')
             if not cleaned_data.get('employer_industry'):
                 raise forms.ValidationError('Please enter your employer industry.')
@@ -346,33 +255,17 @@ class RegisterForm(UserCreationForm):
         user.set_password(self.cleaned_data["password1"])
         if commit:
             user.save()
-            Profile.objects.create(user=user)
+            Profile.objects.create(
+                user=user,
+                occupation=self.cleaned_data.get('occupation'),
+                industry=self.cleaned_data.get('candidate_industry') or self.cleaned_data.get('employer_industry'),
+                company_name=self.cleaned_data.get('company_name'),
+                profile_picture=self.cleaned_data.get('photo')
+            )
         return user
-    
-class CandidateProfileForm(forms.ModelForm):
-    class Meta:
-        model = Profile
-        fields = [
-            'occupation', 'date_of_birth', 'industry', 
-            'currently_employed', 'current_company'
-        ]
-
-class EmployerProfileForm(forms.ModelForm):
-    class Meta:
-        model = Profile
-        fields = [
-            'company_name', 'company_start_date', 'company_size', 
-            'company_industry', 'years_in_business', 'website', 
-            'description', 'location'
-        ]
 
 class JobForm(forms.ModelForm):
     class Meta:
         model = Job
-        fields = ['title', 'company_name', 'description', 'experience', 'job_type', 'salary', 'deadline']
-
-class CVForm(forms.ModelForm):
-    class Meta:
-        model = CV
-        fields = ['job', 'candidate_name', 'resume']
-
+        fields = ['title', 'company_name', 'location', 'description', 
+                 'experience', 'job_type', 'salary', 'deadline']

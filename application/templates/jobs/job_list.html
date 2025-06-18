@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="job-list-container">
+    <h1>Job Listings</h1>
+    
+    <!-- Search Form -->
+    <form method="get" class="job-search-form">
+        <input type="text" name="company_name" placeholder="Company name" value="{{ search_company }}">
+        <input type="text" name="location" placeholder="Location" value="{{ search_location }}">
+        <button type="submit" class="search-button">Search</button>
+    </form>
+
+    <!-- Job Listings -->
+    <div class="job-listings">
+        {% for job in jobs %}
+        <div class="job-card">
+            <h3>{{ job.title }}</h3>
+            <p><strong>Company:</strong> {{ job.company_name }}</p>
+            <p><strong>Location:</strong> {{ job.location|default:"Not specified" }}</p>
+            <p><strong>Salary:</strong> ${{ job.salary }}</p>
+            <p><strong>Type:</strong> {{ job.get_job_type_display }}</p>
+            <p><strong>Experience:</strong> {{ job.experience }} years</p>
+            <p><strong>Deadline:</strong> {{ job.deadline }}</p>
+            <p>{{ job.description|truncatewords:30 }}</p>
+        </div>
+        {% empty %}
+        <p class="no-jobs">No jobs found matching your criteria.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

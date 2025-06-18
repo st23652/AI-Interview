@@ -1,4 +1,6 @@
+from asyncio.log import logger
 from PyPDF2 import PdfReader
+from celery import shared_task
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
@@ -15,7 +17,7 @@ from . import models
 from .forms import CandidateProfileForm, JobApplicationForm, JobForm, ProfileForm, SettingsForm, \
     InterviewScheduleForm, CustomUserCreationForm, InterviewForm, SkillAssessmentForm, UserRegistrationForm, YourForm
 from .forms import AnswerForm
-from .models import InterviewResponse, Candidate, Job
+from .models import InterviewResponse, Candidate, Job, SkillAssessment
 import json
 from .forms import ProfilePictureForm
 from django.views.decorators.csrf import csrf_exempt
@@ -232,7 +234,7 @@ def submit_response(request, interview_id):
         response = InterviewResponse.objects.create(
             interview=interview,
             question=question,
-            response_text=data['response']
+            answer=data['response']
         )
         return JsonResponse({'status': 'success'})
 
@@ -365,23 +367,26 @@ def extract_information(text):
         'education': ', '.join(set(education)),
     }
 
+from django.core.validators import FileExtensionValidator
+from django.core.exceptions import ValidationError
+
+def validate_resume(file):
+    if file.size > 5 * 1024 * 1024:  # 5MB limit
+        raise ValidationError("File too large (max 5MB).")
+    if not file.name.endswith(('.pdf', '.docx')):
+        raise ValidationError("Only PDF/DOCX files allowed.")
+
+@login_required
 def upload_resume(request):
     if request.method == 'POST':
         form = CVUploadForm(request.POST, request.FILES)
         if form.is_valid():
-            resume = form.save(commit=False)
-            resume_text = parse_resume_text(resume.file.path)
-            resume.parsed_text = resume_text
-
-            # Extract information
-            extracted_info = extract_information(resume_text)
-            resume.skills = extracted_info['skills']
-            resume.experience = extracted_info['experience']
-            resume.education = extracted_info['education']
-
-            resume.save()
-            return redirect('resume_success')
-
+            try:
+                validate_resume(request.FILES['file'])
+                form.save()
+                return redirect('resume_success')
+            except ValidationError as e:
+                messages.error(request, str(e))  # User feedback
     else:
         form = CVUploadForm()
     return render(request, 'upload_resume.html', {'form': form})
@@ -415,29 +420,25 @@ def create_interview(request):
 
     return HttpResponse("Interview created and email sent.")
 
-def send_interview_link(interview_id, recruiter_email):
+# tasks.py (Celery task)
+@shared_task(bind=True)
+def send_interview_link_async(self, interview_id, recruiter_email):
     try:
         interview = models.Interview.objects.get(id=interview_id)
-        interview_link = f"http://127.0.0.1:8000/interviews/{interview_id}/"
-
-        subject = "Candidate Interview Link"
-        message = render_to_string('C:/AI-Interview/application/templates/email_templates/interview_link_email.html', {
-            'interview_link': interview_link,
-            'recruiter_name': 'Recruiter',
-        })
-
         send_mail(
-            subject,
-            message,
-            settings.EMAIL_HOST_USER,
-            [recruiter_email],
-            fail_silently=False,
+            subject="Interview Scheduled",
+            message=f"Link: http://example.com/interviews/{interview_id}/",
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[recruiter_email],
         )
     except Exception as e:
-        print(f"Error sending email: {e}")
-        # Log error or notify administrator
+        logger.error(f"Email failed: {e}")
+        self.retry(countdown=60)  # Retry after 60 seconds
 
-@csrf_exempt
+# views.py
+def send_interview_link(interview_id, recruiter_email):
+    send_interview_link_async.delay(interview_id, recruiter_email)  # Non-blocking
+
 def get_next_question(request, interview_id):
     try:
         interview = models.Interview.objects.get(id=interview_id)
@@ -482,14 +483,28 @@ def interview_create(request):
 
     return render(request, 'interview_create.html', {'form': form})
 
-def generate_ai_questions(job_position):
-    openai.api_key = os.getenv("OPENAI_API_KEY")
-    prompt = f"Generate 5 interview questions for the position of {job_position}."
-    response = ChatCompletion.create(
+from django.core.cache import cache
+from tenacity import retry, stop_after_attempt
+
+@retry(stop=stop_after_attempt(3))  # Retry 3 times on failure
+def fetch_ai_questions(job_position):
+    response = openai.ChatCompletion.create(
         model="gpt-4",
-        messages=[{"role": "system", "content": prompt}]
+        messages=[{"role": "system", "content": f"Generate 5 questions for {job_position}."}]
     )
-    return [message['content'] for message in response['choices'][0]['message']]
+    return [choice['message']['content'] for choice in response['choices']]
+
+def generate_ai_questions(job_position):
+    cache_key = f"ai_questions_{job_position}"
+    if cached := cache.get(cache_key):
+        return cached
+    try:
+        questions = fetch_ai_questions(job_position)
+        cache.set(cache_key, questions, timeout=3600)  # Cache for 1 hour
+        return questions
+    except Exception as e:
+        logger.error(f"OpenAI API failed: {e}")
+        return ["Fallback question 1", "Fallback question 2"]  # Graceful degradation
 
 def add_job(request):
     if request.method == 'POST':
@@ -615,8 +630,10 @@ def skill_assessment_create(request):
     return render(request, 'skill_assessment_create.html', {'form': form})
 
 def skill_assessment_list(request):
-    assessments = models.SkillAssessment.objects.all()
-    return render(request, 'skill_assessment_list.html', {'assessments': assessments})
+        assessments = SkillAssessment.objects.all()
+        return render(request, 'skill_assessment/skill_assessment_list.html', {
+        'assessments': assessments
+    })
 
 @login_required
 def profile_update(request):
@@ -661,27 +678,6 @@ def privacy(request):
 
 def terms(request):
     return render(request, 'terms.html')
-
-@login_required
-def interview_list(request):
-    sectors = models.Sector.objects.all()
-    return render(request, 'interview_list', {'sectors': sectors})
-
-@login_required
-def interview_detail(request, sector_id):
-    sector = get_object_or_404(models.Sector, id=sector_id)
-    questions = models.Question.objects.filter(sector=sector).order_by('order')
-    if request.method == 'POST':
-        for question in questions:
-            answer = request.POST.get(f'question_{question.id}')
-            if answer:
-                models.CandidateResponse.objects.create(
-                    candidate=request.user,
-                    question=question,
-                    answer=answer
-                )
-        return redirect('interview_complete')
-    return render(request, 'interview_detail.html', {'sector': sector, 'questions': questions})
 
 @login_required
 def interview_schedule(request):
@@ -782,9 +778,10 @@ def job_create(request):
         form = JobForm()
     return render(request, 'job_create.html', {'form': form})
 
-@login_required
+from django.shortcuts import get_object_or_404
+
 def job_details(request, pk):
-    job = get_object_or_404(models.Job, pk=pk)
+    job = get_object_or_404(Job, pk=pk)  # Returns 404 if not found
     return render(request, 'job_details.html', {'job': job})
 
 @login_required
@@ -824,10 +821,25 @@ def apply_job(request, pk):
     }
     return render(request, 'apply_job.html', context)
 
-@login_required
 def job_list(request):
-    jobs = Job.objects.all().values('id', 'title', 'company', 'location', 'description')
-    return JsonResponse({'jobs': list(jobs)})
+    # Get all jobs ordered by deadline (newest first)
+    jobs = Job.objects.all()
+    
+    # Optional filters (example)
+    company_name = request.GET.get('company_name')
+    location = request.GET.get('location')
+    
+    if company_name:
+        jobs = jobs.filter(company_name__icontains=company_name)
+    if location:
+        jobs = jobs.filter(location__icontains=location)
+    
+    context = {
+        'jobs': jobs,
+        'search_company': company_name or '',
+        'search_location': location or '',
+    }
+    return render(request, 'jobs/job_list.html', context)
 
 def candidate_create(request):
     if request.method == 'POST':
@@ -841,11 +853,22 @@ def candidate_create(request):
         form = InterviewForm()
     return render(request, 'interview_create.html', {'form': form})
 
-@login_required
-def interview_detail(request, pk):
-    interview = get_object_or_404(models.Interview, pk=pk)
-    return render(request, 'interview_detail.html', {'interview': interview})
+from django.views.generic import ListView, DetailView
+from django.shortcuts import get_object_or_404
 
+class InterviewListView(ListView):
+    model = models.Interview
+    template_name = 'interview_list.html'
+    context_object_name = 'interviews'
+    paginate_by = 10  # Added pagination
+
+class InterviewDetailView(DetailView):
+    model = models.Interview
+    template_name = 'interview_detail.html'
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(models.Interview, pk=self.kwargs['pk'])  # Safe 404
+    
 @login_required
 def interview_feedback(request, pk):
     interview = get_object_or_404(models.Interview, pk=pk)
@@ -854,11 +877,6 @@ def interview_feedback(request, pk):
         interview.save()
         return redirect('interview_detail', pk=pk)
     return render(request, 'interview_feedback.html', {'interview': interview})
-
-@login_required
-def interview_list(request):
-    interviews = models.Interview.objects.all()
-    return render(request, 'interview_list.html', {'interviews': interviews})
 
 @login_required
 def job_create(request):

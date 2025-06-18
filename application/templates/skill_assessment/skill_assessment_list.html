@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Skill Assessments</h1>
+
+<table>
+    <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Actions</th>
+    </tr>
+    {% for assessment in assessments %}
+    <tr>
+        <td>{{ assessment.title }}</td>
+        <td>{{ assessment.description|truncatewords:15 }}</td>
+        <td>
+            {% if assessment.pk %}
+                <a href="{% url 'skill_assessment_detail' assessment.pk %}" class="button">View</a>
+                <a href="{% url 'skill_assessment_take' assessment.pk %}" class="button">Take</a>
+            {% else %}
+                <span class="error">Invalid assessment</span>
+            {% endif %}
+        </td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="3">No assessments available</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

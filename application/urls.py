@@ -64,8 +64,8 @@ urlpatterns = [
     path('settings/', views.update_settings, name='settings'),
     path('skills/', views.skill_assessment_list, name='skill_assessment_list'),
     path('skills/create/', views.skill_assessment_create, name='skill_assessment_create'),
-    path('skills/<int:pk>/', views.skill_assessment_detail, name='skill_assessment_detail'),
     path('skills/<int:pk>/result/', views.skill_assessment_result, name='skill_assessment_result'),
+    path('skills/<int:pk>/', views.skill_assessment_detail, name='skill_assessment_detail'),
     path('skills/<int:pk>/take/', views.skill_assessment_take, name='skill_assessment_take'),
     path('upload/', views.upload_resume, name='upload'),
 ]
