@@ -38,6 +38,41 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
 from .utils import detect_face_and_emotion
+from django.shortcuts import render, redirect
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib import messages
+# ======================================================
+# NEWLY ADDED IMPORTS
+# ======================================================
+from django.contrib.auth.models import Group
+
+def register_view(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save() # Save the new user
+
+            # ======================================================
+            # NEWLY ADDED CODE
+            # ======================================================
+            # Find the 'Recruiters' group we created in the admin panel.
+            try:
+                recruiters_group = Group.objects.get(name='Recruiters')
+                # Add the new user to this group.
+                user.groups.add(recruiters_group)
+            except Group.DoesNotExist:
+                # Handle case where group doesn't exist yet, though it shouldn't happen
+                # if you completed Step 1.
+                pass
+            # ======================================================
+
+            messages.success(request, 'Account created successfully! Please log in.')
+            return redirect('login')
+    else:
+        form = UserCreationForm()
+    
+    context = {'form': form}
+    return render(request, 'templates/register.html', context)
 
 @csrf_exempt
 def process_image(request):
@@ -54,7 +89,6 @@ UPLOAD_FOLDER = "uploads"
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
-
 @csrf_exempt
 def ai_interview(request):
     if request.method == "POST":
@@ -67,7 +101,6 @@ def ai_interview(request):
         return JsonResponse({"question": next_question})
 
     return JsonResponse({"error": "Invalid request"}, status=400)
-
 
 @csrf_exempt
 def ai_feedback(request):
@@ -188,7 +221,6 @@ def fetch_questions(request, interview_id):
     questions_data = [{'id': q.id, 'text': q.question_text} for q in questions]
     return JsonResponse({'questions': questions_data})
 
-
 @csrf_exempt
 def submit_response(request, interview_id):
     if request.method == 'POST':
@@ -203,7 +235,6 @@ def submit_response(request, interview_id):
             response_text=data['response']
         )
         return JsonResponse({'status': 'success'})
-
 
 def interview_feedback(request, interview_id):
     interview = get_object_or_404(models.Interview, id=interview_id)
@@ -220,11 +251,9 @@ def interview_feedback(request, interview_id):
 
     return render(request, 'interview_feedback.html', {'form': form, 'interview': interview})
 
-
 class CustomUserViewSet(viewsets.ModelViewSet):
     queryset = models.CustomUser.objects.all()  # Get all users
     serializer_class = CustomUserSerializer
-
 
 class JobViewSet(viewsets.ModelViewSet):
     queryset = models.Job.objects.all()
@@ -242,7 +271,6 @@ def dashboard_redirect(request):
         return redirect('employer_dashboard')
     else:
         return redirect('default_dashboard')
-
 
 def candidate_dashboard(request):
     # Example data, typically you'd fetch this from a database
@@ -262,7 +290,6 @@ def candidate_dashboard(request):
     ]
 
     return render(request, 'candidate_dashboard.html', {'jobs': jobs})
-
 
 @login_required
 def employer_dashboard(request):
@@ -285,7 +312,6 @@ def employer_dashboard(request):
 
     return render(request, 'employer_dashboard.html', context)
 
-
 @login_required
 def dashboard(request):
     if request.user.is_employer:
@@ -293,7 +319,6 @@ def dashboard(request):
     elif request.user.is_candidate:
         return render(request, 'candidate_dashboard.html')
     return redirect('user_login')
-
 
 def some_view(request):
     user = request.user
@@ -303,7 +328,6 @@ def some_view(request):
     }
     return render(request, 'your_template.html', context)
 
-
 nlp = spacy.load('en_core_web_sm')
 matcher = Matcher(nlp.vocab)
 
@@ -311,11 +335,9 @@ matcher = Matcher(nlp.vocab)
 skill_pattern = [{"POS": "NOUN", "OP": "+"}, {"LOWER": "experience"}]
 matcher.add("EXPERIENCE", [skill_pattern])
 
-
 def parse_resume_text(file_path):
     text = extract_text(file_path)
     return text
-
 
 def extract_information(text):
     doc = nlp(text)
@@ -342,7 +364,6 @@ def extract_information(text):
         'experience': ', '.join(set(experience)),
         'education': ', '.join(set(education)),
     }
-
 
 def upload_resume(request):
     if request.method == 'POST':
@@ -394,7 +415,6 @@ def create_interview(request):
 
     return HttpResponse("Interview created and email sent.")
 
-
 def send_interview_link(interview_id, recruiter_email):
     try:
         interview = models.Interview.objects.get(id=interview_id)
@@ -417,7 +437,6 @@ def send_interview_link(interview_id, recruiter_email):
         print(f"Error sending email: {e}")
         # Log error or notify administrator
 
-
 @csrf_exempt
 def get_next_question(request, interview_id):
     try:
@@ -430,7 +449,6 @@ def get_next_question(request, interview_id):
     except models.Interview.DoesNotExist:
         return JsonResponse({'error': 'Interview not found'}, status=404)
 
-
 def generate_next_question(job, answers):
     # Example logic to generate the next question based on answers
     questions = models.InterviewQuestion.objects.filter(job=job).values_list('question', flat=True)
@@ -439,7 +457,6 @@ def generate_next_question(job, answers):
         return questions[0] if questions else "No questions available."
     else:
         return questions[len(answers)] if len(answers) < len(questions) else "No more questions."
-
 
 @login_required
 def interview_create(request):
@@ -465,7 +482,6 @@ def interview_create(request):
 
     return render(request, 'interview_create.html', {'form': form})
 
-
 def generate_ai_questions(job_position):
     openai.api_key = os.getenv("OPENAI_API_KEY")
     prompt = f"Generate 5 interview questions for the position of {job_position}."
@@ -474,7 +490,6 @@ def generate_ai_questions(job_position):
         messages=[{"role": "system", "content": prompt}]
     )
     return [message['content'] for message in response['choices'][0]['message']]
-
 
 def add_job(request):
     if request.method == 'POST':
@@ -487,7 +502,6 @@ def add_job(request):
     else:
         form = JobForm()
     return render(request, 'add_job.html', {'form': form})
-
 
 @csrf_exempt
 def save_answers(request, interview_id):
@@ -509,7 +523,6 @@ def save_answers(request, interview_id):
             return JsonResponse({'error': str(e)}, status=400)
     return JsonResponse({'error': 'Invalid request method.'}, status=405)
 
-
 def profile(request):
     profile = request.user.profile  # Assuming the user has a one-to-one relationship with the Profile model
 
@@ -525,7 +538,6 @@ def profile(request):
 
     return render(request, 'profile.html', {'form': form, 'user': request.user})
 
-
 def interview_questions(request, interview_id):
     interview = get_object_or_404(models.Interview, id=interview_id)
     if request.method == 'POST':
@@ -536,7 +548,6 @@ def interview_questions(request, interview_id):
         interview.save()
         return redirect('interview_complete', interview_id=interview.id)
     return render(request, 'interview.html', {'interview': interview})
-
 
 def question_set(request, set_name):
     questions = models.Question.objects.filter(question_set=set_name)
@@ -553,12 +564,10 @@ def question_set(request, set_name):
         form = AnswerForm()
     return render(request, 'question_set.html', {'questions': questions, 'form': form})
 
-
 def skill_assessment_detail(request, pk):
     assessment = get_object_or_404(models.SkillAssessment, pk=pk)
     context = {'assessment': assessment}
     return render(request, 'skill_assessment_detail.html', context)
-
 
 @login_required
 def edit_profile(request):
@@ -582,18 +591,15 @@ def edit_profile(request):
 
     return render(request, 'edit_profile.html', {'form': form, 'industry_choices': industry_choices})
 
-
 def skill_assessment_result(request, pk):
     assessment = get_object_or_404(models.SkillAssessment, pk=pk)
     context = {'assessment': assessment}
     return render(request, 'skill_assessment_result.html', context)
 
-
 def skill_assessment_take(request, pk):
     assessment = get_object_or_404(models.SkillAssessment, pk=pk)
     context = {'assessment': assessment}
     return render(request, 'skill_assessment_take.html', context)
-
 
 def skill_assessment_create(request):
     if request.method == "POST":
@@ -608,11 +614,9 @@ def skill_assessment_create(request):
         form = SkillAssessmentForm()
     return render(request, 'skill_assessment_create.html', {'form': form})
 
-
 def skill_assessment_list(request):
     assessments = models.SkillAssessment.objects.all()
     return render(request, 'skill_assessment_list.html', {'assessments': assessments})
-
 
 @login_required
 def profile_update(request):
@@ -640,7 +644,6 @@ def add_interview(request):
         form = InterviewForm()
     return render(request, 'add_interview.html', {'form': form})
 
-
 def add_candidate(request):
     if request.method == 'POST':
         form = CandidateProfileForm(request.POST, request.FILES)
@@ -653,20 +656,16 @@ def add_candidate(request):
         form = CandidateProfileForm()
     return render(request, 'add_candidate.html', {'form': form})
 
-
 def privacy(request):
     return render(request, 'privacy.html')
 
-
 def terms(request):
     return render(request, 'terms.html')
-
 
 @login_required
 def interview_list(request):
     sectors = models.Sector.objects.all()
     return render(request, 'interview_list', {'sectors': sectors})
-
 
 @login_required
 def interview_detail(request, sector_id):
@@ -683,7 +682,6 @@ def interview_detail(request, sector_id):
                 )
         return redirect('interview_complete')
     return render(request, 'interview_detail.html', {'sector': sector, 'questions': questions})
-
 
 @login_required
 def interview_schedule(request):
@@ -721,11 +719,9 @@ def interview_schedule(request):
 
     return render(request, 'schedule_interview.html', {'form': form})
 
-
 @login_required
 def interview_complete(request):
     return render(request, 'interview_complete.html')
-
 
 @csrf_protect
 def my_protected_view(request):
@@ -739,27 +735,12 @@ def my_protected_view(request):
         form = YourForm()
     return render(request, 'your_template.html', {'form': form})
 
-@csrf_exempt
-def register_view(request):
-    if request.method == 'POST':
-        form = UserRegistrationForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return JsonResponse({'message': 'Registration successful.'}, status=200)
-        else:
-            return JsonResponse({'errors': form.errors}, status=400)
-    else:
-        form = UserRegistrationForm()
-    return render(request, 'register.html', {'form': form})
-
 def csrf_failure(request, reason=""):
     return render(request, '403_csrf.html', status=403)
-
 
 def logout_view(request):
     auth_logout(request)
     return redirect('home')
-
 
 @login_required
 def update_settings(request):
@@ -781,7 +762,6 @@ def home(request):
 def candidate_home(request):
     return render(request, 'candidate_home.html')
 
-
 def employer_home(request):
     return render(request, 'employer_home.html')
 
@@ -802,12 +782,10 @@ def job_create(request):
         form = JobForm()
     return render(request, 'job_create.html', {'form': form})
 
-
 @login_required
 def job_details(request, pk):
     job = get_object_or_404(models.Job, pk=pk)
     return render(request, 'job_details.html', {'job': job})
-
 
 @login_required
 def job_edit(request, pk):
@@ -822,7 +800,6 @@ def job_edit(request, pk):
     else:
         form = JobForm(instance=job)
     return render(request, 'job_edit.html', {'form': form})
-
 
 @login_required
 def apply_job(request, pk):
@@ -864,12 +841,10 @@ def candidate_create(request):
         form = InterviewForm()
     return render(request, 'interview_create.html', {'form': form})
 
-
 @login_required
 def interview_detail(request, pk):
     interview = get_object_or_404(models.Interview, pk=pk)
     return render(request, 'interview_detail.html', {'interview': interview})
-
 
 @login_required
 def interview_feedback(request, pk):
@@ -880,12 +855,10 @@ def interview_feedback(request, pk):
         return redirect('interview_detail', pk=pk)
     return render(request, 'interview_feedback.html', {'interview': interview})
 
-
 @login_required
 def interview_list(request):
     interviews = models.Interview.objects.all()
     return render(request, 'interview_list.html', {'interviews': interviews})
-
 
 @login_required
 def job_create(request):
@@ -899,7 +872,6 @@ def job_create(request):
     else:
         form = JobForm()
     return render(request, 'job_create.html', {'form': form})
-
 
 @login_required
 def candidate_list(request):
