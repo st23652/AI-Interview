@@ -152,60 +152,13 @@ class JobApplicationForm(forms.ModelForm):
             self.fields['candidate_name'].initial = self.instance.candidate.username
             self.fields['candidate_email'].initial = self.instance.candidate.email
 
-class UserRegistrationForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput)
-    confirm_password = forms.CharField(widget=forms.PasswordInput)
-    user_type = forms.ChoiceField(choices=[('candidate', 'Candidate'), ('employer', 'Employer')])
-    occupation = forms.CharField(required=False)
-    candidate_industry = forms.CharField(required=False)
-    company_name = forms.CharField(required=False)
-    employer_industry = forms.CharField(required=False)
-    starting_date = forms.DateField(required=False)
-    company_size = forms.CharField(required=False)
+class UserRegistrationForm(UserCreationForm):
+    email = forms.EmailField(required=True)
     phone = forms.CharField(required=True)
-    profile_picture = forms.ImageField(required=False)
 
     class Meta:
-        model = CustomUser
-        fields = ['username', 'email', 'password', 'confirm_password', 'user_type', 'phone', 'profile_picture']
-
-    def clean(self):
-        cleaned_data = super().clean()
-        password = cleaned_data.get("password")
-        confirm_password = cleaned_data.get("confirm_password")
-        user_type = cleaned_data.get("user_type")
-
-        if password != confirm_password:
-            raise forms.ValidationError("Passwords do not match")
-
-        if user_type == 'candidate':
-            if not cleaned_data.get('occupation'):
-                raise forms.ValidationError('Please enter your occupation.')
-            if not cleaned_data.get('candidate_industry'):
-                raise forms.ValidationError('Please enter your industry.')
-        elif user_type == 'employer':
-            if not cleaned_data.get('company_name'):
-                raise forms.ValidationError('Please enter your company name.')
-            if not cleaned_data.get('employer_industry'):
-                raise forms.ValidationError('Please enter your employer industry.')
-
-        return cleaned_data
-
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        user.set_password(self.cleaned_data["password"])
-        if commit:
-            user.save()
-            Profile.objects.create(
-                user=user,
-                occupation=self.cleaned_data.get('occupation'),
-                company_name=self.cleaned_data.get('company_name'),
-                industry=self.cleaned_data.get('candidate_industry') or self.cleaned_data.get('employer_industry'),
-                starting_date=self.cleaned_data.get('starting_date'),
-                company_size=self.cleaned_data.get('company_size'),
-                profile_picture=self.cleaned_data.get('profile_picture')
-            )
-        return user
+        model = CustomUser  # Use your existing CustomUser
+        fields = ['username', 'email', 'password1', 'password2', 'phone']
 
 class ProfileForm(forms.ModelForm):
     class Meta:

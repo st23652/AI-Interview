@@ -17,7 +17,7 @@ from . import models
 from .forms import CandidateProfileForm, JobApplicationForm, JobForm, ProfileForm, SettingsForm, \
     InterviewScheduleForm, CustomUserCreationForm, InterviewForm, SkillAssessmentForm, UserRegistrationForm, YourForm
 from .forms import AnswerForm
-from .models import InterviewResponse, Candidate, Job, SkillAssessment
+from .models import InterviewResponse, Candidate, Job, JobApplication, SkillAssessment
 import json
 from .forms import ProfilePictureForm
 from django.views.decorators.csrf import csrf_exempt
@@ -381,12 +381,10 @@ def upload_resume(request):
     if request.method == 'POST':
         form = CVUploadForm(request.POST, request.FILES)
         if form.is_valid():
-            try:
-                validate_resume(request.FILES['file'])
-                form.save()
-                return redirect('resume_success')
-            except ValidationError as e:
-                messages.error(request, str(e))  # User feedback
+            cv = form.save(commit=False)
+            cv.user = request.user
+            cv.save()
+            return redirect('resume_success')
     else:
         form = CVUploadForm()
     return render(request, 'upload_resume.html', {'form': form})
@@ -909,7 +907,7 @@ def interview(request):
 
     return render(request, 'interview.html', {'interview': interview})
 
-    profile = Candidate.objects.get(user=interview.candidate)  # Fixed reference
+    profile = CustomUser.objects.filter(is_candidate=True).get(user=interview.candidate)  # Fixed reference
     parsed_data = profile.cv_parsed_data
 
     # Retrieve all previous responses
@@ -972,7 +970,7 @@ def interview(request):
 
 @login_required
 def job_application_list(request):
-    applications = models.CVUpload.objects.filter(user=request.user)
+    applications = JobApplication.objects.filter(candidate=request.user)
     return render(request, 'job_application_list.html', {'applications': applications})
 
 @login_required

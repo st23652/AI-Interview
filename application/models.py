@@ -107,6 +107,15 @@ class CustomUser(AbstractUser, TimeStampedModel):
         verbose_name = _('user')
         verbose_name_plural = _('users')
 
+# models.py
+class CVUpload(TimeStampedModel):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    file = models.FileField(upload_to='cvs/', validators=[validate_pdf])
+    parsed_text = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"CV for {self.user.username}"
+
 class Profile(TimeStampedModel):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='profile')
     profile_picture = models.ImageField(_('profile picture'), upload_to='profile_pics/', blank=True)
