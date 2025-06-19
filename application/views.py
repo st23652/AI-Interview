@@ -14,7 +14,7 @@ from django.views.decorators.csrf import csrf_protect
 import openai
 from docx2txt import docx2txt
 from . import models
-from .models import InterviewResponse, Candidate, Job, JobApplication, SkillAssessment
+from .models import InterviewResponse, Job, JobApplication, SkillAssessment
 import json
 from django.views.decorators.csrf import csrf_exempt
 from openai import ChatCompletion
@@ -35,44 +35,82 @@ from .utils import detect_face_and_emotion
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
+# Corrected import statement at the top of views.py
 from .forms import (
-    AnswerForm, EmailAuthenticationForm, InterviewFeedbackForm, JobApplicationForm, JobForm, ProfileForm, SentimentAnalysisForm, SettingsForm,
-    InterviewScheduleForm, CustomUserCreationForm, InterviewForm, SkillForm, # Correctly renamed to SkillForm
-    UserRegistrationForm
-    # Removed YourForm
+    SentimentAnalysisForm,
+    EmailAuthenticationForm,
+    InterviewFeedbackForm,
+    AnswerForm,
+    InterviewForm,
+    InterviewResponseForm,
+    InterviewScheduleForm,
+    SettingsForm,
+    SkillForm, # Correct form name for SkillAssessment
+    TakeSkillAssessmentForm,
+    CustomUserCreationForm,
+    UserLoginForm,
+    ProfileUpdateForm,
+    JobApplicationForm,
+    UserRegistrationForm,
+    ProfileForm,
+    ProfilePictureForm,
+    RegisterForm,
+    JobForm
 )
 # ======================================================
 # NEWLY ADDED IMPORTS
 # ======================================================
 from django.contrib.auth.models import Group
+from .forms import ProfileUpdateForm, SettingsForm # Assuming SettingsForm is for CustomUser fields
+
+@login_required
+def full_profile_edit(request):
+    user = request.user
+    profile = user.profile
+
+    if request.method == 'POST':
+        # Pass the POST data and files to both forms
+        user_form = SettingsForm(request.POST, instance=user)
+        profile_form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request, 'Your profile has been updated successfully.')
+            return redirect('profile') # Redirect to the profile page
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        # For a GET request, initialize the forms with the current user and profile data
+        user_form = SettingsForm(instance=user)
+        profile_form = ProfileUpdateForm(instance=profile)
+
+    context = {
+        'user_form': user_form,
+        'profile_form': profile_form
+    }
+    return render(request, 'edit_full_profile.html', context)
 
 def register_view(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = RegisterForm(request.POST, request.FILES) # Use your custom RegisterForm
         if form.is_valid():
-            user = form.save() # Save the new user
+            user = form.save() # The form's save method handles user and profile creation
 
-            # ======================================================
-            # NEWLY ADDED CODE
-            # ======================================================
-            # Find the 'Recruiters' group we created in the admin panel.
+            # The logic to add user to a group can remain
             try:
                 recruiters_group = Group.objects.get(name='Recruiters')
-                # Add the new user to this group.
                 user.groups.add(recruiters_group)
             except Group.DoesNotExist:
-                # Handle case where group doesn't exist yet, though it shouldn't happen
-                # if you completed Step 1.
                 pass
-            # ======================================================
 
             messages.success(request, 'Account created successfully! Please log in.')
             return redirect('login')
     else:
-        form = UserCreationForm()
-    
+        form = RegisterForm() # Use your custom RegisterForm
+
     context = {'form': form}
-    return render(request, 'templates/register.html', context)
+    return render(request, 'register.html', context)
 
 @csrf_exempt
 def process_image(request):
@@ -374,18 +412,34 @@ def validate_resume(file):
     if not file.name.endswith(('.pdf', '.docx')):
         raise ValidationError("Only PDF/DOCX files allowed.")
 
-@login_required
-def upload_resume(request):
+# For creating a new candidate, use the 'RegisterForm' which handles user and profile creation.
+def add_candidate(request):
     if request.method == 'POST':
-        form = CVUploadForm(request.POST, request.FILES)
+        form = RegisterForm(request.POST, request.FILES) # Use the existing RegisterForm
         if form.is_valid():
-            cv = form.save(commit=False)
-            cv.user = request.user
-            cv.save()
-            return redirect('resume_success')
+            form.save()
+            return redirect('candidate_list')
+        else:
+            print(form.errors)
     else:
-        form = CVUploadForm()
-    return render(request, 'upload_resume.html', {'form': form})
+        form = RegisterForm() # Use the existing RegisterForm
+    return render(request, 'add_candidate.html', {'form': form})
+
+# For my_protected_view, you must decide what it does and use a relevant form.
+# For example, if it's for settings:
+@login_required
+@csrf_protect
+def my_protected_view(request):
+    if request.method == 'POST':
+        form = SettingsForm(request.POST, instance=request.user) # Use a real form like SettingsForm
+        if form.is_valid():
+            form.save()
+            return redirect('success_url')
+    else:
+        form = SettingsForm(instance=request.user)
+    return render(request, 'your_template.html', {'form': form})
+
+# Remove the 'upload_resume' view, as this functionality can be handled by the profile editing views.
 
 def auto_interview(request):
     return render(request, 'auto_interview.html')
@@ -614,15 +668,14 @@ def skill_assessment_take(request, pk):
 
 def skill_assessment_create(request):
     if request.method == "POST":
-        # Use the correct form name as defined in forms.py
+        # Use the correct form name: SkillForm
         form = SkillForm(request.POST)
         if form.is_valid():
             form.save()
-            return HttpResponse("Skill assessment created successfully!")
-        else:
-            print(form.errors)
+            messages.success(request, "Skill assessment created successfully!")
+            return redirect('skill_assessment_list') # Redirect to a relevant page
     else:
-        # Use the correct form name here as well
+        # Use the correct form name: SkillForm
         form = SkillForm()
     return render(request, 'skill_assessment_create.html', {'form': form})
 
@@ -658,17 +711,7 @@ def add_interview(request):
         form = InterviewForm()
     return render(request, 'add_interview.html', {'form': form})
 
-def add_candidate(request):
-    if request.method == 'POST':
-        form = CandidateProfileForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('candidate_list')
-        else:
-            print(form.errors)
-    else:
-        form = CandidateProfileForm()
-    return render(request, 'add_candidate.html', {'form': form})
+
 
 def privacy(request):
     return render(request, 'privacy.html')
@@ -715,18 +758,6 @@ def interview_schedule(request):
 @login_required
 def interview_complete(request):
     return render(request, 'interview_complete.html')
-
-@csrf_protect
-def my_protected_view(request):
-    if request.method == 'POST':
-        form = YourForm(request.POST)
-        if form.is_valid():
-            return redirect('success_url')
-        else:
-            print(form.errors)
-    else:
-        form = YourForm()
-    return render(request, 'your_template.html', {'form': form})
 
 def csrf_failure(request, reason=""):
     return render(request, '403_csrf.html', status=403)
@@ -842,17 +873,27 @@ def job_list(request):
     }
     return render(request, 'jobs/job_list.html', context)
 
+# Ensure RegisterForm is imported at the top of views.py
+from .forms import RegisterForm
+
+@login_required # It's good practice to protect this view
 def candidate_create(request):
+    # This view is for creating a new candidate (user + profile)
     if request.method == 'POST':
-        form = CandidateProfileForm(request.POST, request.FILES)
+        # Use the correct form for registering a new user and profile
+        form = RegisterForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            form.save() # The form's save method creates both the user and profile
+            messages.success(request, "Candidate created successfully.")
             return redirect('candidate_list')
         else:
             print(form.errors)
     else:
-        form = InterviewForm()
-    return render(request, 'interview_create.html', {'form': form})
+        # Use the correct form for the GET request as well
+        form = RegisterForm()
+
+    # Use a template that is designed for creating a candidate, not an interview
+    return render(request, 'candidate_create.html', {'form': form})
 
 from django.views.generic import ListView, DetailView
 from django.shortcuts import get_object_or_404
@@ -967,14 +1008,14 @@ def job_application_list(request):
 @login_required
 def job_postings(request):
     if request.method == 'POST':
-        form = Job(request.POST)
+        form = JobForm(request.POST) # Use the JobForm
         if form.is_valid():
-            form.save()  # ✅ Save job posting to the database
-            return redirect('job_list')  # Redirect after saving
+            form.save()
+            return redirect('job_list')
         else:
-            print(form.errors)  # Debugging: Print form errors
+            print(form.errors)
     else:
-        form = Job()
+        form = JobForm() # Use the JobForm
 
     return render(request, 'job_postings.html', {'form': form})
 
@@ -986,13 +1027,17 @@ def update_settings(request):
 def profile_update(request):
     return edit_profile(request)
 
+from .models import CustomUser # Make sure CustomUser is imported from models
+
 def reset_password(request):
     if request.method == 'POST':
         email = request.POST.get('email')
-        user = get_object_or_404(CustomUserCreationForm, email=email)
+        # Query the CustomUser model, not a form
+        user = get_object_or_404(CustomUser, email=email)
         if user:
-            # Handle password reset logic
-            return redirect('home')
+            # Handle password reset logic here (e.g., send reset email)
+            messages.success(request, 'A password reset link has been sent to your email.')
+            return redirect('login')
     return render(request, 'reset_password.html')
 
 def contact(request):

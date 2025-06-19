@@ -131,10 +131,20 @@ class UserLoginForm(forms.Form):
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
+        # Remove fields that are not in the Profile model:
+        # 'date_of_birth', 'company_name', 'company_size'
+        # Also, you have two industry fields, one in User and one in Profile.
+        # I am assuming you meant to edit the one in Profile.
         fields = [
-            'profile_picture', 'occupation', 'date_of_birth', 'industry',
-            'currently_employed', 'current_company', 'company_name',
-            'company_start_date', 'company_size', 'company_industry'
+            'profile_picture',
+            'occupation',
+            'industry', # This is Profile.industry
+            'experience',
+            'currently_employed',
+            'current_company',
+            'company_start_date',
+            'website',
+            'company_description'
         ]
 
 class JobApplicationForm(forms.ModelForm):
@@ -165,9 +175,19 @@ class UserRegistrationForm(UserCreationForm):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['profile_picture', 'occupation', 'date_of_birth', 'industry', 
-                 'currently_employed', 'current_company', 'company_name',
-                 'company_start_date', 'company_size', 'company_industry']
+        # The fields list must only contain fields defined in the Profile model.
+        fields = [
+            'profile_picture',
+            'resume',
+            'occupation',
+            'industry',
+            'experience',
+            'currently_employed',
+            'current_company',
+            'company_start_date',
+            'website',
+            'company_description'
+        ]
 
 class ProfilePictureForm(forms.ModelForm):
     class Meta:

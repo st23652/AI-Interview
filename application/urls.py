@@ -1,14 +1,13 @@
 # Define the router and register your viewsets
-from importlib.simple import SimpleReader
 from os import path, stat
 from django import views
 from django.conf import settings
 from django.urls import include
 
 from application.views import ai_feedback, ai_interview
+from rest_framework.routers import SimpleRouter
 
-
-router = SimpleReader()
+router = SimpleRouter()
 # Note: You registered JobViewSet with 'users'. This might be a typo. Let's assume you meant 'jobs'.
 router.register(r'jobs', views.JobViewSet) 
 router.register(r'users', views.CustomUserViewSet)
