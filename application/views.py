@@ -14,27 +14,19 @@ from django.views.decorators.csrf import csrf_protect
 import openai
 from docx2txt import docx2txt
 from . import models
-from .forms import CandidateProfileForm, JobApplicationForm, JobForm, ProfileForm, SettingsForm, \
-    InterviewScheduleForm, CustomUserCreationForm, InterviewForm, SkillAssessmentForm, UserRegistrationForm, YourForm
-from .forms import AnswerForm
 from .models import InterviewResponse, Candidate, Job, JobApplication, SkillAssessment
 import json
-from .forms import ProfilePictureForm
 from django.views.decorators.csrf import csrf_exempt
 from openai import ChatCompletion
 from django.template.loader import render_to_string
 import spacy
 from pdfminer.high_level import extract_text
-from .forms import CVUploadForm
 from spacy.matcher import Matcher
 from rest_framework import viewsets
 from .serializers import InterviewSerializer, JobSerializer, CustomUserSerializer
-from .forms import InterviewFeedbackForm
 import os
 from dotenv import load_dotenv
 from application.ai_feedback.analyzers import InternalSentimentAnalyzer
-from .forms import SentimentAnalysisForm
-from .forms import EmailAuthenticationForm  # Import the custom form
 from .utils import generate_interview_question, evaluate_answer
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -43,6 +35,12 @@ from .utils import detect_face_and_emotion
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
+from .forms import (
+    AnswerForm, EmailAuthenticationForm, InterviewFeedbackForm, JobApplicationForm, JobForm, ProfileForm, SentimentAnalysisForm, SettingsForm,
+    InterviewScheduleForm, CustomUserCreationForm, InterviewForm, SkillForm, # Correctly renamed to SkillForm
+    UserRegistrationForm
+    # Removed YourForm
+)
 # ======================================================
 # NEWLY ADDED IMPORTS
 # ======================================================
@@ -616,15 +614,16 @@ def skill_assessment_take(request, pk):
 
 def skill_assessment_create(request):
     if request.method == "POST":
-        # Handle form submission
-        form = SkillAssessmentForm(request.POST)
+        # Use the correct form name as defined in forms.py
+        form = SkillForm(request.POST)
         if form.is_valid():
             form.save()
             return HttpResponse("Skill assessment created successfully!")
         else:
             print(form.errors)
     else:
-        form = SkillAssessmentForm()
+        # Use the correct form name here as well
+        form = SkillForm()
     return render(request, 'skill_assessment_create.html', {'form': form})
 
 def skill_assessment_list(request):
@@ -763,18 +762,22 @@ def employer_home(request):
 def profile(request):
     return render(request, 'profile.html')
 
+# Keep only the second, more correct version of job_create and delete the first one.
 @login_required
 def job_create(request):
     if request.method == 'POST':
         form = JobForm(request.POST)
         if form.is_valid():
-            job = form.save(commit=False)
-            job.profile = request.user.profile
-            job.save()
+            # The Job model has no 'profile' field, so this is the correct way to save it.
+            form.save()
             return redirect('job_list')
+        else:
+            print(form.errors)
     else:
         form = JobForm()
     return render(request, 'job_create.html', {'form': form})
+
+# Do the same for all other duplicated views.
 
 from django.shortcuts import get_object_or_404
 
@@ -805,7 +808,7 @@ def apply_job(request, pk):
         if form.is_valid():
             application = form.save(commit=False)
             application.job = job
-            application.candidate = request.user.profile
+            application.candidate = request.user 
             application.save()
             return redirect('application_success')
         else:
@@ -877,21 +880,9 @@ def interview_feedback(request, pk):
     return render(request, 'interview_feedback.html', {'interview': interview})
 
 @login_required
-def job_create(request):
-    if request.method == 'POST':
-        form = JobForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('job_list')
-        else:
-            print(form.errors)
-    else:
-        form = JobForm()
-    return render(request, 'job_create.html', {'form': form})
-
-@login_required
 def candidate_list(request):
-    candidates = models.Profile.objects.filter(is_candidate=True)
+    # Use 'user__is_candidate' to follow the relationship from Profile to CustomUser.
+    candidates = models.Profile.objects.filter(user__is_candidate=True)
     return render(request, 'candidate_list.html', {'candidates': candidates})
 
 @login_required

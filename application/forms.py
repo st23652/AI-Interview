@@ -104,7 +104,9 @@ class SkillForm(forms.ModelForm):
 class TakeSkillAssessmentForm(forms.ModelForm):
     class Meta:
         model = AssessmentResult
-        fields = ['answers']
+        # The 'details' JSONField is the correct place to store arbitrary answers.
+        # Your frontend would need to submit a JSON string to this field.
+        fields = ['details']
 
 class CustomUserCreationForm(UserCreationForm):
     name = forms.CharField(max_length=100, required=True)

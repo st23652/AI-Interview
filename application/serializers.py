@@ -1,41 +1,45 @@
-# serializers.py
-from django.contrib.postgres import serializers
+from rest_framework import serializers # Correct import for ModelSerializer
 
-from .models import CustomUser
-from .models import Profile, Job, Application, Interview, Question, InterviewQuestion
+# Correctly import the models that actually exist.
+from .models import (
+    CustomUser, 
+    Profile, 
+    Job, 
+    JobApplication, # Correct name
+    Interview, 
+    InterviewQuestion, 
+    AssessmentQuestion # Correct name
+)
 
 
-class CustomUserSerializer(serializers.BaseSerializer):
+class CustomUserSerializer(serializers.ModelSerializer): # Use ModelSerializer
     class Meta:
         model = CustomUser
         fields = '__all__'
 
-class ProfileSerializer(serializers.BaseSerializer):
+class ProfileSerializer(serializers.ModelSerializer): # Use ModelSerializer
     class Meta:
         model = Profile
         fields = '__all__'
 
-class JobSerializer(serializers.BaseSerializer):
+class JobSerializer(serializers.ModelSerializer): # Use ModelSerializer
     class Meta:
         model = Job
         fields = '__all__'
 
-class ApplicationSerializer(serializers.BaseSerializer):
+# Corrected serializer for JobApplication
+class JobApplicationSerializer(serializers.ModelSerializer): # Use ModelSerializer
     class Meta:
-        model = Application
+        model = JobApplication # Use correct model
         fields = '__all__'
 
-class InterviewSerializer(serializers.BaseSerializer):
+class InterviewSerializer(serializers.ModelSerializer): # Use ModelSerializer
     class Meta:
         model = Interview
         fields = '__all__'
 
-class QuestionSerializer(serializers.BaseSerializer):
-    class Meta:
-        model = Question
-        fields = '__all__'
-
-class InterviewQuestionSerializer(serializers.BaseSerializer):
+# This serializer can now be used for InterviewQuestion
+class InterviewQuestionSerializer(serializers.ModelSerializer): # Use ModelSerializer
     class Meta:
         model = InterviewQuestion
         fields = '__all__'
