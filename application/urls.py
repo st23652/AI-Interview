@@ -1,8 +1,10 @@
 # Define the router and register your viewsets
-from os import path, stat
-from django import views
-from django.conf import settings
-from django.urls import include
+import stat
+from django.urls import path, include
+from rest_framework.routers import SimpleRouter
+
+from myproject import settings
+from . import views
 
 from application.views import ai_feedback, ai_interview
 from rest_framework.routers import SimpleRouter
@@ -49,8 +51,8 @@ urlpatterns = [
 
     # Interview
     path('interview/create/', views.interview_create, name='interview_create'),
-    path('interviews/', views.interview_list, name='interview_list'), # A list view
-    path('interview/<int:pk>/', views.interview_detail, name='interview_detail'),
+    path('interviews/', views.InterviewListView.as_view(), name='interview_list'),
+    path('interview/<int:pk>/', views.InterviewDetailView.as_view(), name='interview_detail'),
     path('interview/<int:pk>/feedback/', views.interview_feedback, name='interview_feedback'),
     path('interview/schedule/', views.interview_schedule, name='interview_schedule'),
     path('interview/complete/', views.interview_complete, name='interview_complete'),
@@ -64,10 +66,5 @@ urlpatterns = [
     path('skills/<int:pk>/result/', views.skill_assessment_result, name='skill_assessment_result'),
 
     # Other
-    path('upload_resume/', views.upload_resume, name='upload_resume'),
     # ... other unique paths
 ]
-
-# Add static URL handling in DEBUG mode
-if settings.DEBUG:
-    urlpatterns += stat(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
