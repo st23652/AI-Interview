@@ -6,7 +6,7 @@ from rest_framework.routers import SimpleRouter
 from myproject import settings
 from . import views
 
-from application.views import ai_feedback, ai_interview
+from application.views import JobPostView, ai_feedback, ai_interview
 from rest_framework.routers import SimpleRouter
 
 router = SimpleRouter()
@@ -45,6 +45,7 @@ urlpatterns = [
     # Job and Application
     path('jobs/', views.job_list, name='job_list'),
     path('job/create/', views.job_create, name='job_create'),
+    path('jobs/post/', JobPostView, name='job_postings'),
     path('job/<int:pk>/', views.job_details, name='job_details'),
     path('job/<int:pk>/edit/', views.job_edit, name='job_edit'),
     path('job/<int:pk>/apply/', views.apply_job, name='apply_job'), # Assumes apply_job needs pk
@@ -52,6 +53,7 @@ urlpatterns = [
     # Interview
     path('interview/create/', views.interview_create, name='interview_create'),
     path('interviews/', views.InterviewListView.as_view(), name='interview_list'),
+    path('interview/practice/', views.interview, name='interview'),
     path('interview/<int:pk>/', views.InterviewDetailView.as_view(), name='interview_detail'),
     path('interview/<int:pk>/feedback/', views.interview_feedback, name='interview_feedback'),
     path('interview/schedule/', views.interview_schedule, name='interview_schedule'),
@@ -67,4 +69,5 @@ urlpatterns = [
 
     # Other
     # ... other unique paths
+    path('upload/', views.upload, name='upload'),
 ]

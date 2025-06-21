@@ -63,6 +63,9 @@ from .forms import (
 from django.contrib.auth.models import Group
 from .forms import ProfileUpdateForm, SettingsForm # Assuming SettingsForm is for CustomUser fields
 
+def upload(request):
+    return render(request, 'upload.html')
+
 @login_required
 def full_profile_edit(request):
     user = request.user
@@ -724,7 +727,7 @@ def interview_schedule(request):
     # Check if CV is uploaded
     application = models.Application.objects.filter(user=request.user).exists()
     if not application:
-        return redirect('job_postings')
+        return redirect('JobPostView')
 
     if request.method == 'POST':
         # Save the interview schedule
@@ -748,7 +751,7 @@ def interview_schedule(request):
             )
 
             # Redirect to job postings page
-            return redirect('job_postings')
+            return redirect('JobPostView')
 
     else:
         form = InterviewScheduleForm()
@@ -1006,7 +1009,7 @@ def job_application_list(request):
     return render(request, 'job_application_list.html', {'applications': applications})
 
 @login_required
-def job_postings(request):
+def JobPostView(request):
     if request.method == 'POST':
         form = JobForm(request.POST) # Use the JobForm
         if form.is_valid():

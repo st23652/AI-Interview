@@ -3,7 +3,7 @@
 {% block content %}
     <div class="container text-center mt-5">
         <h2>Upload CV & Job Description</h2>
-        <form id="uploadForm" action="{% url 'upload_files' %}" method="post" enctype="multipart/form-data" class="border p-4 bg-light rounded d-inline-block">
+        <form id="uploadForm" action="{% url 'upload' %}" method="post" enctype="multipart/form-data" class="border p-4 bg-light rounded d-inline-block">
             {% csrf_token %}
             <div class="mb-3">
                 <label for="cv" class="form-label">Upload CV:</label>
@@ -23,7 +23,7 @@
             event.preventDefault();
             let formData = new FormData(this);
 
-            fetch("{% url 'upload_files' %}", {
+            fetch("{% url 'upload' %}", {
                 method: "POST",
                 body: formData
             })
