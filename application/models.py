@@ -150,6 +150,7 @@ class Job(models.Model):
     deadline = models.DateField(_('application deadline'))
     is_active = models.BooleanField(_('is active'), default=True)
     created_at = models.DateTimeField(default=timezone.now)
+    id = models.AutoField(primary_key=True)
 
     class Meta:
         ordering = ['-created_at']
@@ -186,6 +187,7 @@ class Interview(TimeStampedModel):
     status = models.CharField(_('status'), max_length=20, choices=Choices.INTERVIEW_STATUS, default='scheduled')
     question_set = models.CharField(_('question set'), max_length=50, choices=Choices.QUESTION_SET)
     feedback = models.TextField(default="No feedback provided")
+    id = models.AutoField(primary_key=True)
 
     class Meta:
         ordering = ['-scheduled_time']
@@ -223,6 +225,7 @@ class SkillAssessment(TimeStampedModel):
     description = models.TextField(_('description'))
     passing_score = models.PositiveIntegerField(_('passing score'), default=70)
     is_active = models.BooleanField(_('is active'), default=True)
+    id = models.AutoField(primary_key=True)
 
     def __str__(self):
         return self.name

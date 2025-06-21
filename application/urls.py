@@ -11,11 +11,15 @@ from rest_framework.routers import DefaultRouter
 from application.views import CustomUserViewSet
 
 router = DefaultRouter()
-router.register(r'customuser', CustomUserViewSet, basename='customuser')
+# Register your viewsets with the router
+
+
+  # Register JobDetailView with 'jobs'
+# Register JobPostView if it's a viewset, otherwise use a regular path
+ # Assuming JobPostView is a viewset
+# If JobPostView is not a viewset, you can use a regular path instead:
 
 # Note: You registered JobViewSet with 'users'. This might be a typo. Let's assume you meant 'jobs'.
-router.register(r'jobs', views.JobViewSet) 
-router.register(r'interview', InterviewViewSet, basename='interview')
 
 # Define your URL patterns
 urlpatterns = [
@@ -48,7 +52,6 @@ urlpatterns = [
     path('jobs/', views.job_list, name='job_list'),
     path('job/create/', views.job_create, name='job_create'),
     path('jobs/post/', JobPostView, name='job_postings'),
-    path('job/{pk}/', JobDetailView, name='job_details'),
     path('job/edit/', views.job_edit, name='job_edit'),
     path('job/apply/', views.apply_job, name='apply_job'),
 
@@ -56,7 +59,6 @@ urlpatterns = [
     path('interview/create/', views.interview_create, name='interview_create'),
     path('interviews/', views.InterviewListView.as_view(), name='interview_list'),
     path('interview/practice/', views.interview, name='interview'),
-    path('interview/{pk}/', InterviewDetailView.as_view(), name='interview_detail'),
     path('interview/feedback/', views.interview_feedback, name='interview_feedback'),
     path('interview/schedule/', views.interview_schedule, name='interview_schedule'),
     path('interview/complete/', views.interview_complete, name='interview_complete'),
@@ -65,7 +67,6 @@ urlpatterns = [
     # Skill Assessment
     path('skills/', views.skill_assessment_list, name='skill_assessment_list'),
     path('skills/create/', views.skill_assessment_create, name='skill_assessment_create'),
-    path('skills/{pk}/', views.skill_assessment_detail, name='skill_assessment_detail'),
     path('skills/result/', views.skill_assessment_result, name='skill_assessment_result'),
     path('skills/take/', views.skill_assessment_take, name='skill_assessment_take'),
 
@@ -76,5 +77,5 @@ urlpatterns = [
 
 ]
 urlpatterns += router.urls
-urlpatterns += staticfiles()
+
 
