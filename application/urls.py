@@ -70,4 +70,6 @@ urlpatterns = [
     # Other
     # ... other unique paths
     path('upload/', views.upload, name='upload'),
+    path('upload/files', views.upload_files, name='upload_files')
+
 ]

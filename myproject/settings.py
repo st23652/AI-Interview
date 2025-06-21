@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+import secrets
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -20,9 +21,16 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-yzp)ko$iekzbb#lkxxg4*qgiw4^+-l2%)71$1q^2^xwh300@@f'
+SECRET_KEY = secrets.token_urlsafe(64)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+
+SECURE_SSL_REDIRECT = True
+
+SECURE_HSTS_SECONDS = 31536000
+
+SESSION_COOKIE_SECURE = True
 
 ALLOWED_HOSTS = [
     '127.0.0.1',

@@ -454,6 +454,10 @@ message = render_to_string('email_templates/interview_link_email.html', {
 })
 print(message)
 
+def upload_files(request):
+    # your logic here
+    return HttpResponse("Upload files view")
+
 def create_interview(request):
     # Code to create an interview instance
     interview = models.Interview.objects.create(
@@ -534,7 +538,7 @@ def interview_create(request):
     else:
         form = InterviewForm()
 
-    return render(request, 'interview_create.html', {'form': form})
+    return render(request, 'interview/interview_create.html', {'form': form})
 
 from django.core.cache import cache
 from tenacity import retry, stop_after_attempt
@@ -569,7 +573,7 @@ def add_job(request):
             print(form.errors)
     else:
         form = JobForm()
-    return render(request, 'add_job.html', {'form': form})
+    return render(request, 'jobs/add_job.html', {'form': form})
 
 @csrf_exempt
 def save_answers(request, interview_id):
@@ -614,8 +618,8 @@ def interview_questions(request, interview_id):
         interview.answers = answers
         interview.completed = True
         interview.save()
-        return redirect('interview_complete', interview_id=interview.id)
-    return render(request, 'interview.html', {'interview': interview})
+        return redirect('interview/interview_complete', interview_id=interview.id)
+    return render(request, 'interview/interview.html', {'interview': interview})
 
 def question_set(request, set_name):
     questions = models.Question.objects.filter(question_set=set_name)
@@ -635,7 +639,7 @@ def question_set(request, set_name):
 def skill_assessment_detail(request, pk):
     assessment = get_object_or_404(models.SkillAssessment, pk=pk)
     context = {'assessment': assessment}
-    return render(request, 'skill_assessment_detail.html', context)
+    return render(request, 'skill_assessment/skill_assessment_detail.html', context)
 
 @login_required
 def edit_profile(request):
@@ -662,12 +666,12 @@ def edit_profile(request):
 def skill_assessment_result(request, pk):
     assessment = get_object_or_404(models.SkillAssessment, pk=pk)
     context = {'assessment': assessment}
-    return render(request, 'skill_assessment_result.html', context)
+    return render(request, 'skill_assessment/skill_assessment_result.html', context)
 
 def skill_assessment_take(request, pk):
     assessment = get_object_or_404(models.SkillAssessment, pk=pk)
     context = {'assessment': assessment}
-    return render(request, 'skill_assessment_take.html', context)
+    return render(request, 'skill_assessment/skill_assessment_take.html', context)
 
 def skill_assessment_create(request):
     if request.method == "POST":
@@ -676,11 +680,11 @@ def skill_assessment_create(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Skill assessment created successfully!")
-            return redirect('skill_assessment_list') # Redirect to a relevant page
+            return redirect('skill_assessment/skill_assessment_list') # Redirect to a relevant page
     else:
         # Use the correct form name: SkillForm
         form = SkillForm()
-    return render(request, 'skill_assessment_create.html', {'form': form})
+    return render(request, 'skill_assessment/skill_assessment_create.html', {'form': form})
 
 def skill_assessment_list(request):
         assessments = SkillAssessment.objects.all()
@@ -760,7 +764,7 @@ def interview_schedule(request):
 
 @login_required
 def interview_complete(request):
-    return render(request, 'interview_complete.html')
+    return render(request, 'interview/interview_complete.html')
 
 def csrf_failure(request, reason=""):
     return render(request, '403_csrf.html', status=403)
@@ -809,7 +813,7 @@ def job_create(request):
             print(form.errors)
     else:
         form = JobForm()
-    return render(request, 'job_create.html', {'form': form})
+    return render(request, 'jobs/job_create.html', {'form': form})
 
 # Do the same for all other duplicated views.
 
@@ -817,7 +821,7 @@ from django.shortcuts import get_object_or_404
 
 def job_details(request, pk):
     job = get_object_or_404(Job, pk=pk)  # Returns 404 if not found
-    return render(request, 'job_details.html', {'job': job})
+    return render(request, 'jobs/job_details.html', {'job': job})
 
 @login_required
 def job_edit(request, pk):
@@ -831,7 +835,7 @@ def job_edit(request, pk):
             print(form.errors)
     else:
         form = JobForm(instance=job)
-    return render(request, 'job_edit.html', {'form': form})
+    return render(request, 'jobs/job_edit.html', {'form': form})
 
 @login_required
 def apply_job(request, pk):
@@ -903,13 +907,13 @@ from django.shortcuts import get_object_or_404
 
 class InterviewListView(ListView):
     model = models.Interview
-    template_name = 'interview_list.html'
+    template_name = 'interview/interview_list.html'
     context_object_name = 'interviews'
     paginate_by = 10  # Added pagination
 
 class InterviewDetailView(DetailView):
     model = models.Interview
-    template_name = 'interview_detail.html'
+    template_name = 'interview/interview_detail.html'
 
     def get_object(self, queryset=None):
         return get_object_or_404(models.Interview, pk=self.kwargs['pk'])  # Safe 404
@@ -921,7 +925,7 @@ def interview_feedback(request, pk):
         interview.feedback = request.POST['feedback']
         interview.save()
         return redirect('interview_detail', pk=pk)
-    return render(request, 'interview_feedback.html', {'interview': interview})
+    return render(request, 'interview/interview_feedback.html', {'interview': interview})
 
 @login_required
 def candidate_list(request):
@@ -932,7 +936,7 @@ def candidate_list(request):
 @login_required
 def interview_schedule(request):
     # Placeholder logic for scheduling interviews
-    return render(request, 'interview_schedule.html')
+    return render(request, 'interview/interview_schedule.html')
 
 @login_required
 def interview(request):
@@ -940,7 +944,7 @@ def interview(request):
     interview = models.Interview.objects.filter(candidate=request.user, status='ongoing').first()
  # Redirect if no interview exists
 
-    return render(request, 'interview.html', {'interview': interview})
+    return render(request, 'interview/interview.html', {'interview': interview})
 
     profile = CustomUser.objects.filter(is_candidate=True).get(user=interview.candidate)  # Fixed reference
     parsed_data = profile.cv_parsed_data
@@ -998,7 +1002,7 @@ def interview(request):
                 interview.save()
                 return redirect('interview_complete')  # Fixed redirection
 
-    return render(request, 'interview.html', {
+    return render(request, 'interview/interview.html', {
         'current_question': current_question,
         'candidate_responses': candidate_responses
     })
@@ -1006,7 +1010,7 @@ def interview(request):
 @login_required
 def job_application_list(request):
     applications = JobApplication.objects.filter(candidate=request.user)
-    return render(request, 'job_application_list.html', {'applications': applications})
+    return render(request, 'jobs/job_application_list.html', {'applications': applications})
 
 @login_required
 def JobPostView(request):
@@ -1020,7 +1024,7 @@ def JobPostView(request):
     else:
         form = JobForm() # Use the JobForm
 
-    return render(request, 'job_postings.html', {'form': form})
+    return render(request, 'jobs/job_postings.html', {'form': form})
 
 def update_settings(request):
     # Logic to update settings goes here

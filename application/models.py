@@ -177,7 +177,7 @@ class JobApplication(TimeStampedModel):
 # Interview-related models
 class Interview(TimeStampedModel):
     candidate = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='interviews')
-    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='interviews', null=True, blank=True)
+    job = models.ForeignKey(Job, on_delete=models.CASCADE)  # <- Ensure this exists
     title = models.CharField(_('title'), max_length=200)
     description = models.TextField(_('description'), blank=True)
     interviewer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='conducted_interviews')
