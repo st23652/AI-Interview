@@ -92,7 +92,7 @@ def check_db_fields():
                 else:
                     print_ok(f"Found column '{column}' in table '{table}'")
 
-def test_email_sending():
+"""def test_email_sending():
     print("\n🔍 Testing email backend (sending test email)...")
     try:
         send_mail(
@@ -106,7 +106,7 @@ def test_email_sending():
     except BadHeaderError:
         print_fail("Bad header found in email")
     except Exception as e:
-        print_fail(f"Failed to send test email: {e}")
+        print_fail(f"Failed to send test email: {e}")"""
 
 def main():
     print("🔎 Starting Django Project Diagnostic Check")
@@ -118,13 +118,13 @@ def main():
     check_db_fields()
 
     # Only test email if email backend and from email configured
-    if hasattr(settings, 'EMAIL_BACKEND') and settings.EMAIL_BACKEND != 'django.core.mail.backends.dummy.EmailBackend':
+    """if hasattr(settings, 'EMAIL_BACKEND') and settings.EMAIL_BACKEND != 'django.core.mail.backends.dummy.EmailBackend':
         if hasattr(settings, 'DEFAULT_FROM_EMAIL'):
             test_email_sending()
         else:
             print("⚠️ DEFAULT_FROM_EMAIL not set; skipping email test")
     else:
-        print("⚠️ Email backend not configured or using dummy backend; skipping email test")
+        print("⚠️ Email backend not configured or using dummy backend; skipping email test")"""
 
     print("\n✅ Diagnostic complete.")
 

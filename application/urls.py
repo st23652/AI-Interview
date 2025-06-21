@@ -1,19 +1,21 @@
 # Define the router and register your viewsets
 import stat
 from django.urls import path, include
-from rest_framework.routers import SimpleRouter
+from fastapi import staticfiles
 
 from myproject import settings
 from . import views
 
-from application.views import JobPostView, ai_feedback, ai_interview
-from rest_framework.routers import SimpleRouter
+from application.views import InterviewDetailView, InterviewViewSet, JobDetailView, JobPostView, ai_feedback, ai_interview
+from rest_framework.routers import DefaultRouter
+from application.views import CustomUserViewSet
 
-router = SimpleRouter()
+router = DefaultRouter()
+router.register(r'customuser', CustomUserViewSet, basename='customuser')
+
 # Note: You registered JobViewSet with 'users'. This might be a typo. Let's assume you meant 'jobs'.
 router.register(r'jobs', views.JobViewSet) 
-router.register(r'users', views.CustomUserViewSet)
-router.register(r'interviews', views.InterviewViewSet)
+router.register(r'interview', InterviewViewSet, basename='interview')
 
 # Define your URL patterns
 urlpatterns = [
@@ -21,7 +23,7 @@ urlpatterns = [
     path('api/', include(router.urls)), # Include router URLs once
     path("api/interview/", ai_interview, name="ai_interview"),
     path("api/feedback/", ai_feedback, name="ai_feedback"),
-    path('api/interview/<int:interview_id>/questions/', views.get_interview_questions, name='get_interview_questions'),
+    path('interview/questions/', views.get_interview_questions, name='get_interview_questions'),
 
     # Main pages
     path('home/', views.home, name='home'),
@@ -46,16 +48,16 @@ urlpatterns = [
     path('jobs/', views.job_list, name='job_list'),
     path('job/create/', views.job_create, name='job_create'),
     path('jobs/post/', JobPostView, name='job_postings'),
-    path('job/<int:pk>/', views.job_details, name='job_details'),
-    path('job/<int:pk>/edit/', views.job_edit, name='job_edit'),
-    path('job/<int:pk>/apply/', views.apply_job, name='apply_job'), # Assumes apply_job needs pk
+    path('job/{pk}/', JobDetailView, name='job_details'),
+    path('job/edit/', views.job_edit, name='job_edit'),
+    path('job/apply/', views.apply_job, name='apply_job'),
 
     # Interview
     path('interview/create/', views.interview_create, name='interview_create'),
     path('interviews/', views.InterviewListView.as_view(), name='interview_list'),
     path('interview/practice/', views.interview, name='interview'),
-    path('interview/<int:pk>/', views.InterviewDetailView.as_view(), name='interview_detail'),
-    path('interview/<int:pk>/feedback/', views.interview_feedback, name='interview_feedback'),
+    path('interview/{pk}/', InterviewDetailView.as_view(), name='interview_detail'),
+    path('interview/feedback/', views.interview_feedback, name='interview_feedback'),
     path('interview/schedule/', views.interview_schedule, name='interview_schedule'),
     path('interview/complete/', views.interview_complete, name='interview_complete'),
     path('interview/start/', views.interview, name='start_interview'), # Renamed for clarity
@@ -63,13 +65,16 @@ urlpatterns = [
     # Skill Assessment
     path('skills/', views.skill_assessment_list, name='skill_assessment_list'),
     path('skills/create/', views.skill_assessment_create, name='skill_assessment_create'),
-    path('skills/<int:pk>/', views.skill_assessment_detail, name='skill_assessment_detail'),
-    path('skills/<int:pk>/take/', views.skill_assessment_take, name='skill_assessment_take'),
-    path('skills/<int:pk>/result/', views.skill_assessment_result, name='skill_assessment_result'),
+    path('skills/{pk}/', views.skill_assessment_detail, name='skill_assessment_detail'),
+    path('skills/result/', views.skill_assessment_result, name='skill_assessment_result'),
+    path('skills/take/', views.skill_assessment_take, name='skill_assessment_take'),
 
     # Other
     # ... other unique paths
     path('upload/', views.upload, name='upload'),
-    path('upload/files', views.upload_files, name='upload_files')
+    path('upload/files', views.upload_files, name='upload_files'),
 
 ]
+urlpatterns += router.urls
+urlpatterns += staticfiles()
+

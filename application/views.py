@@ -819,7 +819,7 @@ def job_create(request):
 
 from django.shortcuts import get_object_or_404
 
-def job_details(request, pk):
+def JobDetailView(request, pk):
     job = get_object_or_404(Job, pk=pk)  # Returns 404 if not found
     return render(request, 'jobs/job_details.html', {'job': job})
 
@@ -838,8 +838,8 @@ def job_edit(request, pk):
     return render(request, 'jobs/job_edit.html', {'form': form})
 
 @login_required
-def apply_job(request, pk):
-    job = get_object_or_404(models.Job, pk=pk)
+def apply_job(request, job_id):
+    job = get_object_or_404(models.Job, pk=job_id)
 
     if request.method == 'POST':
         form = JobApplicationForm(request.POST, request.FILES)
