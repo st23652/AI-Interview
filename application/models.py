@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.contrib.auth import settings
 from django.contrib.auth.models import BaseUserManager, AbstractUser
 from django.core.exceptions import ValidationError
@@ -69,8 +70,6 @@ def validate_phone(value):
 
 # Abstract base models
 class TimeStampedModel(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         abstract = True
@@ -81,9 +80,9 @@ class CustomUser(AbstractUser, TimeStampedModel):
     email = models.EmailField(_('email address'), unique=True)
     phone = models.CharField(_('phone'), max_length=20, blank=True, null=True, validators=[validate_phone])
     date_of_birth = models.DateField(_('date of birth'), null=True, blank=True)
-    bio = models.TextField(_('bio'), blank=True)
-    linkedin = models.URLField(_('LinkedIn'), blank=True)
-    github = models.URLField(_('GitHub'), blank=True)
+    bio = models.TextField(default="")  # or 'No bio provided'
+    linkedin = models.URLField(default="https://www.linkedin.com/")
+    github = models.URLField(default="https://github.com/")
     
     # Type flags
     user_type = models.CharField(_('user type'), max_length=20, choices=Choices.USER_TYPE, default='candidate')
@@ -91,9 +90,9 @@ class CustomUser(AbstractUser, TimeStampedModel):
     is_candidate = models.BooleanField(_('is candidate'), default=False)
     
     # Employer fields
-    company_name = models.CharField(_('company name'), max_length=255, blank=True)
-    industry = models.CharField(_('industry'), max_length=255, choices=Choices.INDUSTRY, blank=True)
-    company_size = models.CharField(_('company size'), max_length=50, choices=Choices.COMPANY_SIZE, blank=True)
+    company_name = models.CharField(max_length=255, default="Unknown Company")
+    industry = models.CharField(max_length=100, default="Not specified")
+    company_size = models.IntegerField(default=0)
     
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
@@ -110,7 +109,7 @@ class CustomUser(AbstractUser, TimeStampedModel):
 # models.py
 class CVUpload(TimeStampedModel):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    file = models.FileField(upload_to='cvs/', validators=[validate_pdf])
+    file = models.FileField(upload_to='cvs/', default='default_cv.pdf')
     parsed_text = models.TextField(blank=True)
 
     def __str__(self):
@@ -118,13 +117,13 @@ class CVUpload(TimeStampedModel):
 
 class Profile(TimeStampedModel):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='profile')
-    profile_picture = models.ImageField(_('profile picture'), upload_to='profile_pics/', blank=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/', default='profile_pics/default.jpeg')
     resume = models.FileField(_('resume'), upload_to='resumes/', blank=True, validators=[validate_pdf])
     
     # Common fields
     occupation = models.CharField(_('occupation'), max_length=100, blank=True)
     industry = models.CharField(_('industry'), max_length=100, choices=Choices.INDUSTRY, blank=True)
-    experience = models.TextField(_('experience'), blank=True)
+    experience = models.TextField(default="No experience provided")
     
     # Candidate-specific
     currently_employed = models.BooleanField(_('currently employed'), default=False)
@@ -139,10 +138,10 @@ class Profile(TimeStampedModel):
         return f"{self.user.username}'s Profile"
 
 # Job-related models
-class Job(TimeStampedModel):
+class Job(models.Model):
     title = models.CharField(_('title'), max_length=255)
     company_name = models.CharField(_('company name'), max_length=255)
-    location = models.CharField(_('location'), max_length=255, blank=True)
+    location = models.CharField(max_length=255, default="Not specified")
     description = models.TextField(_('description'))
     requirements = models.TextField(_('requirements'), blank=True)
     experience = models.PositiveIntegerField(_('years of experience'), default=0)
@@ -150,6 +149,7 @@ class Job(TimeStampedModel):
     salary = models.DecimalField(_('salary'), max_digits=10, decimal_places=2)
     deadline = models.DateField(_('application deadline'))
     is_active = models.BooleanField(_('is active'), default=True)
+    created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
         ordering = ['-created_at']
@@ -163,8 +163,9 @@ class JobApplication(TimeStampedModel):
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='applications')
     candidate = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='applications')
     resume = models.FileField(_('resume'), upload_to='application_resumes/', validators=[validate_pdf])
-    cover_letter = models.TextField(_('cover letter'), blank=True)
+    cover_letter = models.TextField(default="No cover letter provided")
     status = models.CharField(_('status'), max_length=20, default='pending')
+    created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
         unique_together = ('job', 'candidate')
@@ -180,11 +181,11 @@ class Interview(TimeStampedModel):
     title = models.CharField(_('title'), max_length=200)
     description = models.TextField(_('description'), blank=True)
     interviewer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='conducted_interviews')
-    scheduled_time = models.DateTimeField(_('scheduled time'))
+    scheduled_time = models.DateTimeField(default=timezone.now)
     duration = models.PositiveIntegerField(_('duration (minutes)'), default=30)
     status = models.CharField(_('status'), max_length=20, choices=Choices.INTERVIEW_STATUS, default='scheduled')
     question_set = models.CharField(_('question set'), max_length=50, choices=Choices.QUESTION_SET)
-    feedback = models.TextField(_('feedback'), blank=True)
+    feedback = models.TextField(default="No feedback provided")
 
     class Meta:
         ordering = ['-scheduled_time']
@@ -193,8 +194,8 @@ class Interview(TimeStampedModel):
         return f"Interview for {self.candidate} - {self.title}"
 
 class InterviewQuestion(models.Model):
-    question_set = models.CharField(_('question set'), max_length=50, choices=Choices.QUESTION_SET)
-    text = models.TextField(_('question text'))
+    question_set = models.CharField(max_length=255, default='Default Set')  # adjust as needed
+    text = models.TextField(default='Placeholder question')  # or an actual default question
     order = models.PositiveIntegerField(_('order'))
 
     class Meta:
@@ -207,7 +208,7 @@ class InterviewQuestion(models.Model):
 class InterviewResponse(TimeStampedModel):
     interview = models.ForeignKey(Interview, on_delete=models.CASCADE, related_name='responses')
     question = models.ForeignKey(InterviewQuestion, on_delete=models.CASCADE, related_name='responses')
-    answer = models.TextField(_('answer'))
+    answer = models.TextField(default="No response")
     score = models.PositiveIntegerField(_('score'), null=True, blank=True)
 
     class Meta:
@@ -239,12 +240,13 @@ class AssessmentQuestion(models.Model):
     def __str__(self):
         return f"Q{self.order} for {self.assessment}"
 
-class AssessmentResult(TimeStampedModel):
+class AssessmentResult(models.Model):
     assessment = models.ForeignKey(SkillAssessment, on_delete=models.CASCADE, related_name='results')
     candidate = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='assessment_results')
     score = models.DecimalField(_('score'), max_digits=5, decimal_places=2)
     passed = models.BooleanField(_('passed'), default=False)
     details = models.JSONField(_('details'), default=dict)
+    created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
         ordering = ['-created_at']
