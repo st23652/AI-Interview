@@ -76,6 +76,5 @@ urlpatterns = [
     path('upload/files', views.upload_files, name='upload_files'),
 
 ]
-urlpatterns += router.urls
 
 

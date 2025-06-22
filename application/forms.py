@@ -203,7 +203,7 @@ class RegisterForm(UserCreationForm):
     company_name = forms.CharField(required=False)
     employer_industry = forms.CharField(required=False)
     photo = forms.ImageField(required=False)
-
+   
     class Meta:
         model = CustomUser
         fields = ['username', 'email', 'password1', 'password2', 'phone', 'user_type']
