@@ -228,14 +228,24 @@ class RegisterForm(UserCreationForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data["password1"])
+
+        # Set user_type
+        user.user_type = self.cleaned_data.get('user_type')
+
+        # You can also set is_employed or other flags here, e.g.
+        user.is_employed = False  # or True if logic applies
+
         if commit:
             user.save()
+
+            # Create Profile with fields depending on user_type
             Profile.objects.create(
                 user=user,
-                occupation=self.cleaned_data.get('occupation'),
-                industry=self.cleaned_data.get('candidate_industry') or self.cleaned_data.get('employer_industry'),
-                company_name=self.cleaned_data.get('company_name'),
-                profile_picture=self.cleaned_data.get('photo')
+                occupation=self.cleaned_data.get('occupation') if user.user_type == 'candidate' else '',
+                industry=(self.cleaned_data.get('candidate_industry') if user.user_type == 'candidate' 
+                          else self.cleaned_data.get('employer_industry')),
+                company_name=self.cleaned_data.get('company_name') if user.user_type == 'employer' else '',
+                profile_picture=self.cleaned_data.get('photo'),
             )
         return user
 

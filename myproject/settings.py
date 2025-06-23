@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-yzp)ko$iekzbb#lkxxg4*qgiw4^+-l2%)71$1q^2^xwh300@@f
 SECRET_KEY = secrets.token_urlsafe(64)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 SECURE_SSL_REDIRECT = False
 

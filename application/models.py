@@ -84,8 +84,13 @@ class CustomUser(AbstractUser, TimeStampedModel):
     linkedin = models.URLField(default="https://www.linkedin.com/")
     github = models.URLField(default="https://github.com/")
     
+    USER_TYPE_CHOICES = (
+    ('candidate', 'Candidate'),
+    ('employer', 'Employer'),
+    )
+    
     # Type flags
-    user_type = models.CharField(_('user type'), max_length=20, choices=Choices.USER_TYPE, default='candidate')
+    user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES)
     is_employer = models.BooleanField(_('is employer'), default=False)
     is_candidate = models.BooleanField(_('is candidate'), default=False)
     

@@ -96,24 +96,22 @@ def full_profile_edit(request):
 
 def register_view(request):
     if request.method == 'POST':
-        form = RegisterForm(request.POST, request.FILES) # Use your custom RegisterForm
+        form = RegisterForm(request.POST, request.FILES)
         if form.is_valid():
-            user = form.save() # The form's save method handles user and profile creation
+            user = form.save()
 
-            # The logic to add user to a group can remain
-            try:
-                recruiters_group = Group.objects.get(name='Recruiters')
-                user.groups.add(recruiters_group)
-            except Group.DoesNotExist:
-                pass
+            # Optionally log the user in immediately after registration
+            login(request, user)
 
-            messages.success(request, 'Account created successfully! Please log in.')
-            return redirect('login')
+            # Redirect based on user type
+            if user.user_type == 'candidate':
+                return redirect('candidate_dashboard')
+            else:
+                return redirect('employer_dashboard')
     else:
-        form = RegisterForm() # Use your custom RegisterForm
+        form = RegisterForm()
 
-    context = {'form': form}
-    return render(request, 'register.html', context)
+    return render(request, 'register.html', {'form': form})
 
 @csrf_exempt
 def process_image(request):
